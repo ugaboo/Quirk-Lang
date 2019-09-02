@@ -1,6 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Quirk.Lexeme;
-using static Quirk.ErrorType;
 
 namespace Quirk.Tests
 {
@@ -153,9 +153,9 @@ namespace Quirk.Tests
         }
 
         [TestMethod()]
-        public void IndentationErrors()
+        public void Indents_ExpectedAnIndentedBlock()
         {
-            var scan = new Scanner("Code/Scanner/Errors/Indents.qk");
+            var scan = new Scanner("Code/Scanner/Indents_ExpectedAnIndentedBlock.qk");
             Assert.AreEqual(Indent, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(Id, scan.Lexeme);
@@ -164,8 +164,10 @@ namespace Quirk.Tests
             try {
                 scan.Next();
             } catch (CompilationError exc) {
-                Assert.AreEqual(ExpectedAnIndentedBlock, exc.Type);
+                Assert.AreEqual(ErrorType.ExpectedAnIndentedBlock, exc.Type);
+                return;
             }
+            throw new Exception("Failed");
         }
 
         [TestMethod()]

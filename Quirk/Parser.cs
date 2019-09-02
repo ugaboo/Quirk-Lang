@@ -24,7 +24,7 @@ namespace Quirk
             if (Stmnt(module.NameTable, module.Statements)) {
                 goto _0;
             }
-            return false;
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -68,7 +68,7 @@ namespace Quirk
                 scan.Next();
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -102,9 +102,10 @@ namespace Quirk
                 goto _4;
             }
             if (rightParts.Count > 0) {
-                for (var i = rightParts.Count - 1; i >= 0; i -= 1) {
-                    statements.Add(new AST.Assignment(left, rightParts[i]));
+                for (var i = rightParts.Count - 1; i >= 1; i -= 1) {
+                    statements.Add(new AST.Assignment(rightParts[i - 1], rightParts[i]));
                 }
+                statements.Add(new AST.Assignment(left, rightParts[0]));
             } else {
                 statements.Add(new AST.Evaluation(left));
             }
@@ -114,7 +115,7 @@ namespace Quirk
                 rightParts.Add(right);
                 goto _3;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }

@@ -9,7 +9,7 @@ namespace Quirk
     {
         UnexpectedToken,
         ExpectedAnIndentedBlock,
-        InconsistentWhitespace,
+        InvalidSyntax,
     }
 
     public class CompilationError : Exception
