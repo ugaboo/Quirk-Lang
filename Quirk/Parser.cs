@@ -175,7 +175,7 @@ namespace Quirk
                 expr = new AST.BinaryExpression(AST.BinaryExpressionType.Or, expr, right);
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.KwOr) {
                 scan.Next();
@@ -197,7 +197,7 @@ namespace Quirk
                 expr = new AST.BinaryExpression(AST.BinaryExpressionType.And, expr, right);
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.KwAnd) {
                 scan.Next();
@@ -223,7 +223,7 @@ namespace Quirk
                 expr = new AST.UnaryExpression(AST.UnaryExpressionType.Not, right);
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }

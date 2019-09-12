@@ -32,18 +32,6 @@ namespace Quirk.Tests
         }
 
         [TestMethod()]
-        public void Module_InvalidSyntax()
-        {
-            try {
-                new Parser("Code/Parser/Module_InvalidSyntax.qk", "Module_InvalidSyntax", out var module);
-            } catch (CompilationError exc) {
-                Assert.AreEqual(ErrorType.InvalidSyntax, exc.Type);
-                return;
-            }
-            throw new Exception("Failed");
-        }
-
-        [TestMethod()]
         public void SimpleStmnt()
         {
             new Parser("Code/Parser/SimpleStmnt.qk", "SimpleStmnt", out var module);
@@ -53,65 +41,102 @@ namespace Quirk.Tests
         }
 
         [TestMethod()]
-        public void SimpleStmnt_InvalidSyntax()
-        {
-            try {
-                new Parser("Code/Parser/SimpleStmnt_InvalidSyntax.qk", "SimpleStmnt_InvalidSyntax", out var module);
-            } catch (CompilationError exc) {
-                Assert.AreEqual(ErrorType.InvalidSyntax, exc.Type);
-                return;
-            }
-            throw new Exception("Failed");
-        }
-
-        [TestMethod()]
         public void ExprStmnt()
         {
             new Parser("Code/Parser/ExprStmnt.qk", "ExprStmnt", out var module);
             Assert.AreEqual(5, module.Statements.Count);
 
             var evaluation = module.Statements[0] as AST.Evaluation;
-            Assert.AreNotEqual(null, evaluation);
             var two = evaluation.Expr as AST.ConstInt;
             Assert.AreEqual(2, two.Value);
 
             var assignment = module.Statements[1] as AST.Assignment;
-            Assert.AreNotEqual(null, assignment);
             var x = assignment.Left as AST.NamedObj;
             Assert.AreEqual("x", x.Name);
             var zero = assignment.Right as AST.ConstInt;
             Assert.AreEqual(0, zero.Value);
 
             assignment = module.Statements[2] as AST.Assignment;
-            Assert.AreNotEqual(null, assignment);
             var z = assignment.Left as AST.NamedObj;
             Assert.AreEqual("z", z.Name);
             var one = assignment.Right as AST.ConstInt;
             Assert.AreEqual(1, one.Value);
 
             assignment = module.Statements[3] as AST.Assignment;
-            Assert.AreNotEqual(null, assignment);
             var y = assignment.Left as AST.NamedObj;
             Assert.AreEqual("y", y.Name);
             Assert.AreEqual(z, assignment.Right);
 
             assignment = module.Statements[4] as AST.Assignment;
-            Assert.AreNotEqual(null, assignment);
             x = assignment.Left as AST.NamedObj;        // NamedObj was created anew in the Atom method
             Assert.AreEqual("x", x.Name);
             Assert.AreEqual(y, assignment.Right);
         }
 
         [TestMethod()]
-        public void ExprStmnt_InvalidSyntax()
+        public void OrTest()
         {
-            try {
-                new Parser("Code/Parser/ExprStmnt_InvalidSyntax.qk", "ExprStmnt_InvalidSyntax", out var module);
-            } catch (CompilationError exc) {
-                Assert.AreEqual(ErrorType.InvalidSyntax, exc.Type);
-                return;
-            }
-            throw new Exception("Failed");
+            new Parser("Code/Parser/OrTest.qk", "OrTest", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = module.Statements[0] as AST.Evaluation;
+
+            var expr1 = evaluation.Expr as AST.BinaryExpression;
+            Assert.AreEqual(AST.BinaryExpressionType.Or, expr1.Type);
+
+            var expr2 = expr1.Left as AST.BinaryExpression;
+            Assert.AreEqual(AST.BinaryExpressionType.Or, expr2.Type);
+
+            var const1 = expr2.Left as AST.ConstBool;
+            Assert.AreEqual(true, const1.Value);
+
+            var const2 = expr2.Right as AST.ConstBool;
+            Assert.AreEqual(false, const2.Value);
+
+            var const3 = expr1.Right as AST.ConstBool;
+            Assert.AreEqual(true, const3.Value);
+        }
+
+        [TestMethod()]
+        public void AndTest()
+        {
+            new Parser("Code/Parser/AndTest.qk", "AndTest", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = module.Statements[0] as AST.Evaluation;
+
+            var expr1 = evaluation.Expr as AST.BinaryExpression;
+            Assert.AreEqual(AST.BinaryExpressionType.And, expr1.Type);
+
+            var expr2 = expr1.Left as AST.BinaryExpression;
+            Assert.AreEqual(AST.BinaryExpressionType.And, expr2.Type);
+
+            var const1 = expr2.Left as AST.ConstBool;
+            Assert.AreEqual(false, const1.Value);
+
+            var const2 = expr2.Right as AST.ConstBool;
+            Assert.AreEqual(true, const2.Value);
+
+            var const3 = expr1.Right as AST.ConstBool;
+            Assert.AreEqual(false, const3.Value);
+        }
+
+        [TestMethod()]
+        public void NotTest()
+        {
+            new Parser("Code/Parser/NotTest.qk", "NotTest", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = module.Statements[0] as AST.Evaluation;
+
+            var expr1 = evaluation.Expr as AST.UnaryExpression;
+            Assert.AreEqual(AST.UnaryExpressionType.Not, expr1.Type);
+
+            var expr2 = expr1.Expr as AST.UnaryExpression;
+            Assert.AreEqual(AST.UnaryExpressionType.Not, expr2.Type);
+
+            var const1 = expr2.Expr as AST.ConstBool;
+            Assert.AreEqual(true, const1.Value);
         }
 
         [TestMethod()]

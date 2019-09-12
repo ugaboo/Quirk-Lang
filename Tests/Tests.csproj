@@ -25,7 +25,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Code\Parser\ExprStmnt_InvalidSyntax.qk">
+    <None Update="Code\Parser\Errors\AndTest.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\Parser\Errors\NotTest.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\Parser\Errors\OrTest.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\Parser\OrTest.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\Parser\AndTest.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\Parser\Errors\ExprStmnt.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Code\Parser\ExprStmnt.qk">
@@ -34,10 +49,13 @@
     <None Update="Code\Parser\Functions.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Code\Parser\SimpleStmnt_InvalidSyntax.qk">
+    <None Update="Code\Parser\NotTest.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Code\Parser\Module_InvalidSyntax.qk">
+    <None Update="Code\Parser\Errors\SimpleStmnt.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\Parser\Errors\Module.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Code\Parser\SimpleStmnt.qk">
