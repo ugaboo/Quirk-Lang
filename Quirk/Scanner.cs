@@ -98,7 +98,6 @@ namespace Quirk
                         case '<':
                             reader.Next();
                             switch (reader.Value) {
-                                case '>': SetLexeme(Lexeme.NotEqual); break;
                                 case '<': SetLexeme(Lexeme.LeftShift); break;
                                 case '=': SetLexeme(Lexeme.LessOrEqual); break;
                                 default: Lexeme = Lexeme.Less; break;

@@ -231,17 +231,27 @@ namespace Quirk
         bool Comparison(out AST.IProgObj expr)
         {
             AST.BinaryExpressionType type;
+            AST.IProgObj left;
+            var chained = false;
 
             if (Expr(out expr)) {
+                left = expr;
                 goto _2;
             }
             return false;
         _1:
             if (Expr(out var right)) {
-                expr = new AST.BinaryExpression(type, expr, right);
+                var comp = new AST.BinaryExpression(type, left, right);
+                left = right;
+                if (chained) {
+                    expr = new AST.BinaryExpression(AST.BinaryExpressionType.And, expr, comp);
+                } else {
+                    expr = comp;
+                    chained = true;
+                }
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (CompOp(out type)) {
                 goto _1;
@@ -300,7 +310,7 @@ namespace Quirk
                 expr = new AST.BinaryExpression(AST.BinaryExpressionType.BitOr, expr, right);
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.BitOr) {
                 scan.Next();
@@ -322,7 +332,7 @@ namespace Quirk
                 expr = new AST.BinaryExpression(AST.BinaryExpressionType.BitXor, expr, right);
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.BitXor) {
                 scan.Next();
@@ -344,7 +354,7 @@ namespace Quirk
                 expr = new AST.BinaryExpression(AST.BinaryExpressionType.BitAnd, expr, right);
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.BitAnd) {
                 scan.Next();
@@ -368,7 +378,7 @@ namespace Quirk
                 expr = new AST.BinaryExpression(type, expr, right);
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.LeftShift) {
                 type = AST.BinaryExpressionType.LeftShift;
@@ -398,7 +408,7 @@ namespace Quirk
                 expr = new AST.BinaryExpression(type, expr, right);
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.Plus) {
                 type = AST.BinaryExpressionType.Add;
@@ -429,7 +439,7 @@ namespace Quirk
                 expr = new AST.BinaryExpression(type, expr, right);
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.Star) {
                 type = AST.BinaryExpressionType.Mul;
@@ -485,7 +495,7 @@ namespace Quirk
                 expr = new AST.UnaryExpression(type, right);
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -508,7 +518,7 @@ namespace Quirk
                 expr = new AST.BinaryExpression(AST.BinaryExpressionType.Power, expr, right);
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -524,7 +534,7 @@ namespace Quirk
         //    if (Atom()) {
         //        goto _2;
         //    }
-        //    throw new Exception();
+        //    throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (Trailer(expr, out var trailer)) {
                 expr = trailer;
@@ -578,7 +588,7 @@ namespace Quirk
                 scan.Next();
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -603,7 +613,7 @@ namespace Quirk
                 scan.Next();
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -631,7 +641,7 @@ namespace Quirk
         //        scan.Next();
         //        goto _2;
         //    }
-        //    throw new Exception();
+        //    CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -677,7 +687,7 @@ namespace Quirk
         //    if (Test()) {
         //        goto _end;
         //    }
-        //    throw new Exception();
+        //    CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -707,12 +717,12 @@ namespace Quirk
                 scan.Next();
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (Stmnt(nameTable, statements)) {
                 goto _3;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _3:
             if (Stmnt(nameTable, statements)) {
                 goto _3;
@@ -725,7 +735,7 @@ namespace Quirk
                 scan.Next();
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -746,12 +756,12 @@ namespace Quirk
                 scan.Next();
                 goto _2;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (Parameters(func.Parameters)) {
                 goto _3;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _3:
             goto _5;
         _5:
@@ -759,12 +769,12 @@ namespace Quirk
                 scan.Next();
                 goto _6;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _6:
             if (Suite(func.NameTable, func.Statements)) {
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             nameTable[func.Name] = func;
             return true;
@@ -787,7 +797,7 @@ namespace Quirk
                 scan.Next();
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }
@@ -849,7 +859,7 @@ namespace Quirk
             if (Test(out var expr)) {
                 goto _end;
             }
-            throw new Exception();
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }

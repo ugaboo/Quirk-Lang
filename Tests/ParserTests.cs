@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Quirk.Tests
@@ -7,21 +6,20 @@ namespace Quirk.Tests
     [TestClass()]
     public class ParserTests
     {
-        [TestMethod()]
-        public void Test()
-        {
-            var parser = new Parser("Code/Parser/Test.qk", "Test", out var module);
-            module.Accept(new Visitors.NameFinder());
-            module.Accept(new Visitors.CodeGenerator());
+        //[TestMethod()] public void Test()
+        //{
+        //    var parser = new Parser("Code/Parser/Test.qk", "Test", out var module);
+        //    module.Accept(new Visitors.NameFinder());
+        //    module.Accept(new Visitors.CodeGenerator());
 
-            var process = new Process();
-            process.StartInfo = new ProcessStartInfo() {
-                WindowStyle = ProcessWindowStyle.Hidden,
-                FileName = "clang",
-                Arguments = "Test.bc -o test.exe",
-            };
-            process.Start();
-        }
+        //    var process = new Process();
+        //    process.StartInfo = new ProcessStartInfo() {
+        //        WindowStyle = ProcessWindowStyle.Hidden,
+        //        FileName = "clang",
+        //        Arguments = "Test.bc -o test.exe",
+        //    };
+        //    process.Start();
+        //}
 
         [TestMethod()]
         public void Module()
@@ -35,9 +33,7 @@ namespace Quirk.Tests
         public void SimpleStmnt()
         {
             new Parser("Code/Parser/SimpleStmnt.qk", "SimpleStmnt", out var module);
-
-            var s = module.Statements;
-            Assert.AreEqual(4, s.Count);
+            Assert.AreEqual(4, module.Statements.Count);
         }
 
         [TestMethod()]
@@ -46,30 +42,27 @@ namespace Quirk.Tests
             new Parser("Code/Parser/ExprStmnt.qk", "ExprStmnt", out var module);
             Assert.AreEqual(5, module.Statements.Count);
 
-            var evaluation = module.Statements[0] as AST.Evaluation;
-            var two = evaluation.Expr as AST.ConstInt;
-            Assert.AreEqual(2, two.Value);
+            var evaluation = (AST.Evaluation)module.Statements[0];
+            Assert.AreEqual(2, ((AST.ConstInt)evaluation.Expr).Value);
 
-            var assignment = module.Statements[1] as AST.Assignment;
-            var x = assignment.Left as AST.NamedObj;
-            Assert.AreEqual("x", x.Name);
-            var zero = assignment.Right as AST.ConstInt;
-            Assert.AreEqual(0, zero.Value);
+            var assignment = (AST.Assignment)module.Statements[1];
+            Assert.AreEqual("x", ((AST.NamedObj)assignment.Left).Name);
+            Assert.AreEqual(0, ((AST.ConstInt)assignment.Right).Value);
 
-            assignment = module.Statements[2] as AST.Assignment;
-            var z = assignment.Left as AST.NamedObj;
-            Assert.AreEqual("z", z.Name);
-            var one = assignment.Right as AST.ConstInt;
-            Assert.AreEqual(1, one.Value);
+            assignment = (AST.Assignment)module.Statements[2];
+            Assert.AreEqual("z", ((AST.NamedObj)assignment.Left).Name);
+            Assert.AreEqual(1, ((AST.ConstInt)assignment.Right).Value);
 
-            assignment = module.Statements[3] as AST.Assignment;
-            var y = assignment.Left as AST.NamedObj;
-            Assert.AreEqual("y", y.Name);
+            var z = assignment.Left;
+
+            assignment = (AST.Assignment)module.Statements[3];
+            Assert.AreEqual("y", ((AST.NamedObj)assignment.Left).Name);
             Assert.AreEqual(z, assignment.Right);
 
-            assignment = module.Statements[4] as AST.Assignment;
-            x = assignment.Left as AST.NamedObj;        // NamedObj was created anew in the Atom method
-            Assert.AreEqual("x", x.Name);
+            var y = assignment.Left;
+
+            assignment = (AST.Assignment)module.Statements[4];
+            Assert.AreEqual("x", ((AST.NamedObj)assignment.Left).Name);       // NamedObj for 'x' was created anew in the Atom method
             Assert.AreEqual(y, assignment.Right);
         }
 
@@ -79,22 +72,17 @@ namespace Quirk.Tests
             new Parser("Code/Parser/OrTest.qk", "OrTest", out var module);
             Assert.AreEqual(1, module.Statements.Count);
 
-            var evaluation = module.Statements[0] as AST.Evaluation;
+            var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = evaluation.Expr as AST.BinaryExpression;
+            var expr1 = (AST.BinaryExpression)evaluation.Expr;
             Assert.AreEqual(AST.BinaryExpressionType.Or, expr1.Type);
 
-            var expr2 = expr1.Left as AST.BinaryExpression;
+            var expr2 = (AST.BinaryExpression)expr1.Left;
             Assert.AreEqual(AST.BinaryExpressionType.Or, expr2.Type);
 
-            var const1 = expr2.Left as AST.ConstBool;
-            Assert.AreEqual(true, const1.Value);
-
-            var const2 = expr2.Right as AST.ConstBool;
-            Assert.AreEqual(false, const2.Value);
-
-            var const3 = expr1.Right as AST.ConstBool;
-            Assert.AreEqual(true, const3.Value);
+            Assert.AreEqual(true, ((AST.ConstBool)expr2.Left).Value);
+            Assert.AreEqual(false, ((AST.ConstBool)expr2.Right).Value);
+            Assert.AreEqual(true, ((AST.ConstBool)expr1.Right).Value);
         }
 
         [TestMethod()]
@@ -103,22 +91,17 @@ namespace Quirk.Tests
             new Parser("Code/Parser/AndTest.qk", "AndTest", out var module);
             Assert.AreEqual(1, module.Statements.Count);
 
-            var evaluation = module.Statements[0] as AST.Evaluation;
+            var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = evaluation.Expr as AST.BinaryExpression;
+            var expr1 = (AST.BinaryExpression)evaluation.Expr;
             Assert.AreEqual(AST.BinaryExpressionType.And, expr1.Type);
 
-            var expr2 = expr1.Left as AST.BinaryExpression;
+            var expr2 = (AST.BinaryExpression)expr1.Left;
             Assert.AreEqual(AST.BinaryExpressionType.And, expr2.Type);
 
-            var const1 = expr2.Left as AST.ConstBool;
-            Assert.AreEqual(false, const1.Value);
-
-            var const2 = expr2.Right as AST.ConstBool;
-            Assert.AreEqual(true, const2.Value);
-
-            var const3 = expr1.Right as AST.ConstBool;
-            Assert.AreEqual(false, const3.Value);
+            Assert.AreEqual(false, ((AST.ConstBool)expr2.Left).Value);
+            Assert.AreEqual(true, ((AST.ConstBool)expr2.Right).Value);
+            Assert.AreEqual(false, ((AST.ConstBool)expr1.Right).Value);
         }
 
         [TestMethod()]
@@ -127,22 +110,215 @@ namespace Quirk.Tests
             new Parser("Code/Parser/NotTest.qk", "NotTest", out var module);
             Assert.AreEqual(1, module.Statements.Count);
 
-            var evaluation = module.Statements[0] as AST.Evaluation;
+            var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = evaluation.Expr as AST.UnaryExpression;
+            var expr1 = (AST.UnaryExpression)evaluation.Expr;
             Assert.AreEqual(AST.UnaryExpressionType.Not, expr1.Type);
 
-            var expr2 = expr1.Expr as AST.UnaryExpression;
+            var expr2 = (AST.UnaryExpression)expr1.Expr;
             Assert.AreEqual(AST.UnaryExpressionType.Not, expr2.Type);
 
-            var const1 = expr2.Expr as AST.ConstBool;
-            Assert.AreEqual(true, const1.Value);
+            Assert.AreEqual(true, ((AST.ConstBool)expr2.Expr).Value);
         }
 
         [TestMethod()]
-        public void Functions()
+        public void CompOp()
         {
-            new Parser("Code/Parser/Functions.qk", "Functions", out var module);
+            new Parser("Code/Parser/CompOp.qk", "CompOp", out var module);
+            Assert.AreEqual(6, module.Statements.Count);
+
+            var evaluation = (AST.Evaluation)module.Statements[0];
+            var expr = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.Less, expr.Type);
+            Assert.AreEqual(1, ((AST.ConstInt)expr.Left).Value);
+            Assert.AreEqual(2, ((AST.ConstInt)expr.Right).Value);
+
+            evaluation = (AST.Evaluation)module.Statements[1];
+            expr = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.Greater, expr.Type);
+            Assert.AreEqual(2, ((AST.ConstInt)expr.Left).Value);
+            Assert.AreEqual(1, ((AST.ConstInt)expr.Right).Value);
+
+            evaluation = (AST.Evaluation)module.Statements[2];
+            expr = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.Equal, expr.Type);
+            Assert.AreEqual(1, ((AST.ConstInt)expr.Left).Value);
+            Assert.AreEqual(1, ((AST.ConstInt)expr.Right).Value);
+
+            evaluation = (AST.Evaluation)module.Statements[3];
+            expr = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.LessOrEqual, expr.Type);
+            Assert.AreEqual(1, ((AST.ConstInt)expr.Left).Value);
+            Assert.AreEqual(2, ((AST.ConstInt)expr.Right).Value);
+
+            evaluation = (AST.Evaluation)module.Statements[4];
+            expr = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.GreaterOrEqual, expr.Type);
+            Assert.AreEqual(2, ((AST.ConstInt)expr.Left).Value);
+            Assert.AreEqual(1, ((AST.ConstInt)expr.Right).Value);
+
+            evaluation = (AST.Evaluation)module.Statements[5];
+            expr = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.NotEqual, expr.Type);
+            Assert.AreEqual(1, ((AST.ConstInt)expr.Left).Value);
+            Assert.AreEqual(2, ((AST.ConstInt)expr.Right).Value);
         }
+
+        [TestMethod()]
+        public void Comparison()
+        {
+            new Parser("Code/Parser/Comparison.qk", "Comparison", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = (AST.Evaluation)module.Statements[0];
+
+            var rightAnd = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.And, rightAnd.Type);
+
+            var leftAnd = (AST.BinaryExpression)rightAnd.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.And, leftAnd.Type);
+
+            var left = (AST.BinaryExpression)leftAnd.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.Less, left.Type);
+            Assert.AreEqual("x", ((AST.NamedObj)left.Left).Name);
+            Assert.AreEqual("y", ((AST.NamedObj)left.Right).Name);
+
+            var center = (AST.BinaryExpression)leftAnd.Right;
+            Assert.AreEqual(AST.BinaryExpressionType.LessOrEqual, center.Type);
+            Assert.AreEqual("y", ((AST.NamedObj)center.Left).Name);
+            Assert.AreEqual("z", ((AST.NamedObj)center.Right).Name);
+
+            var right = (AST.BinaryExpression)rightAnd.Right;
+            Assert.AreEqual(AST.BinaryExpressionType.Greater, right.Type);
+            Assert.AreEqual("z", ((AST.NamedObj)right.Left).Name);
+            Assert.AreEqual("w", ((AST.NamedObj)right.Right).Name);
+        }
+
+        [TestMethod()]
+        public void Expr()
+        {
+            new Parser("Code/Parser/Expr.qk", "Expr", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = (AST.Evaluation)module.Statements[0];
+
+            var expr1 = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.BitOr, expr1.Type);
+
+            var expr2 = (AST.BinaryExpression)expr1.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.BitOr, expr2.Type);
+
+            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
+            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
+            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+        }
+
+        [TestMethod()]
+        public void XorExpr()
+        {
+            new Parser("Code/Parser/XorExpr.qk", "XorExpr", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = (AST.Evaluation)module.Statements[0];
+
+            var expr1 = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.BitXor, expr1.Type);
+
+            var expr2 = (AST.BinaryExpression)expr1.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.BitXor, expr2.Type);
+
+            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
+            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
+            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+        }
+
+        [TestMethod()]
+        public void AndExpr()
+        {
+            new Parser("Code/Parser/AndExpr.qk", "AndExpr", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = (AST.Evaluation)module.Statements[0];
+
+            var expr1 = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.BitAnd, expr1.Type);
+
+            var expr2 = (AST.BinaryExpression)expr1.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.BitAnd, expr2.Type);
+
+            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
+            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
+            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+        }
+
+        [TestMethod()]
+        public void ShiftExpr()
+        {
+            new Parser("Code/Parser/ShiftExpr.qk", "ShiftExpr", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = (AST.Evaluation)module.Statements[0];
+
+            var expr1 = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.RightShift, expr1.Type);
+
+            var expr2 = (AST.BinaryExpression)expr1.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.LeftShift, expr2.Type);
+
+            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
+            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
+            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+        }
+        
+        [TestMethod()]
+        public void ArithExpr()
+        {
+            new Parser("Code/Parser/ArithExpr.qk", "ArithExpr", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = (AST.Evaluation)module.Statements[0];
+
+            var expr1 = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.Sub, expr1.Type);
+
+            var expr2 = (AST.BinaryExpression)expr1.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.Add, expr2.Type);
+
+            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
+            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
+            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+        }
+
+        [TestMethod()]
+        public void Term()
+        {
+            new Parser("Code/Parser/Term.qk", "Term", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var evaluation = (AST.Evaluation)module.Statements[0];
+
+            var expr1 = (AST.BinaryExpression)evaluation.Expr;
+            Assert.AreEqual(AST.BinaryExpressionType.FloorDiv, expr1.Type);
+
+            var expr2 = (AST.BinaryExpression)expr1.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.Mod, expr2.Type);
+
+            var expr3 = (AST.BinaryExpression)expr2.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.Div, expr3.Type);
+
+            var expr4 = (AST.BinaryExpression)expr3.Left;
+            Assert.AreEqual(AST.BinaryExpressionType.Mul, expr4.Type);
+
+            Assert.AreEqual("a", ((AST.NamedObj)expr4.Left).Name);
+            Assert.AreEqual("b", ((AST.NamedObj)expr4.Right).Name);
+            Assert.AreEqual("c", ((AST.NamedObj)expr3.Right).Name);
+            Assert.AreEqual("d", ((AST.NamedObj)expr2.Right).Name);
+            Assert.AreEqual("e", ((AST.NamedObj)expr1.Right).Name);
+        }
+
+        //[TestMethod()] public void Functions()
+        //{
+        //    new Parser("Code/Parser/Functions.qk", "Functions", out var module);
+        //}
     }
 }

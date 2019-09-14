@@ -10,7 +10,7 @@
         Indent,
         Dedent,
 
-        NotEqual,               // != or <>
+        NotEqual,               // !=
         Percent,                // %
         //ModAssign,              // %=
         BitAnd,                 // &

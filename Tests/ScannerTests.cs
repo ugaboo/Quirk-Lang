@@ -1,14 +1,11 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Quirk.Lexeme;
 
 namespace Quirk.Tests
 {
-    [TestClass()]
-    public class ScannerTests
+    [TestClass()] public class ScannerTests
     {
-        [TestMethod()]
-        public void Operators()
+        [TestMethod()] public void Operators()
         {
             var scan = new Scanner("Code/Scanner/Operators.qk");
             Assert.AreEqual(LeftParenthesis, scan.Lexeme);
@@ -37,10 +34,6 @@ namespace Quirk.Tests
             scan.Next();
             Assert.AreEqual(Percent, scan.Lexeme);
             scan.Next();
-            Assert.AreEqual(NotEqual, scan.Lexeme);
-            scan.Next();
-            Assert.AreEqual(NotEqual, scan.Lexeme);
-            scan.Next();
             Assert.AreEqual(Less, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(LeftShift, scan.Lexeme);
@@ -50,6 +43,8 @@ namespace Quirk.Tests
             Assert.AreEqual(Assignment, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(Equal, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(NotEqual, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(Greater, scan.Lexeme);
             scan.Next();
@@ -68,8 +63,7 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()]
-        public void Keywords()
+        [TestMethod()] public void Keywords()
         {
             var scan = new Scanner("Code/Scanner/Keywords.qk");
             Assert.AreEqual(KwAnd, scan.Lexeme);
@@ -89,8 +83,7 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()]
-        public void Names()
+        [TestMethod()] public void Names()
         {
             var scan = new Scanner("Code/Scanner/Names.qk");
             Assert.AreEqual(Id, scan.Lexeme);
@@ -105,8 +98,7 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()]
-        public void Indents()
+        [TestMethod()] public void Indents()
         {
             var scan = new Scanner("Code/Scanner/Indents.qk");
             Assert.AreEqual(Id, scan.Lexeme);
@@ -152,26 +144,7 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()]
-        public void Indents_ExpectedAnIndentedBlock()
-        {
-            var scan = new Scanner("Code/Scanner/Indents_ExpectedAnIndentedBlock.qk");
-            Assert.AreEqual(Indent, scan.Lexeme);
-            scan.Next();
-            Assert.AreEqual(Id, scan.Lexeme);
-            scan.Next();
-            Assert.AreEqual(NewLine, scan.Lexeme);
-            try {
-                scan.Next();
-            } catch (CompilationError exc) {
-                Assert.AreEqual(ErrorType.ExpectedAnIndentedBlock, exc.Type);
-                return;
-            }
-            throw new Exception("Failed");
-        }
-
-        [TestMethod()]
-        public void Integers()
+        [TestMethod()] public void Integers()
         {
             var scan = new Scanner("Code/Scanner/Integers.qk");
             Assert.AreEqual(Int, scan.Lexeme);
@@ -180,8 +153,7 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()]
-        public void Floats()
+        [TestMethod()] public void Floats()
         {
             var scan = new Scanner("Code/Scanner/Floats.qk");
             Assert.AreEqual(Float, scan.Lexeme);

@@ -23,5 +23,12 @@ namespace Quirk.Tests
         [TestMethod()] public void OrTest() { Test("OrTest"); }
         [TestMethod()] public void AndTest() { Test("AndTest"); }
         [TestMethod()] public void NotTest() { Test("NotTest"); }
+        [TestMethod()] public void Comparison() { Test("Comparison"); }
+        [TestMethod()] public void Expr() { Test("Expr"); }
+        [TestMethod()] public void XorExpr() { Test("XorExpr"); }
+        [TestMethod()] public void AndExpr() { Test("AndExpr"); }
+        [TestMethod()] public void ShiftExpr() { Test("ShiftExpr"); }
+        [TestMethod()] public void ArithExpr() { Test("ArithExpr"); }
+        [TestMethod()] public void Term() { Test("Term"); }
     }
 }
