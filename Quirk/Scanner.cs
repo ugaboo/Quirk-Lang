@@ -19,6 +19,7 @@ namespace Quirk
         Reader reader;
 
         Stack<int> indentation = new Stack<int>();
+        int ignoreNewLine;
 
         StringBuilder textValue, intPart, floatPart, expPart;
 
@@ -74,8 +75,17 @@ namespace Quirk
                     switch (reader.Value) {
                         case char.MaxValue: SetLexeme(Lexeme.EndMarker); break;
                         case '\r':
-                        case '\n': SetLexeme(Lexeme.NewLine); break;
-                        case '#': SkipComment(); Lexeme = Lexeme.Ignore; break;
+                        case '\n':
+                            if (ignoreNewLine > 0) {
+                                SetLexeme(Lexeme.Ignore);
+                            } else {
+                                SetLexeme(Lexeme.NewLine);
+                            }
+                            break;
+                        case '#':
+                            SkipComment();
+                            Lexeme = Lexeme.Ignore;
+                            break;
                         case ',': SetLexeme(Lexeme.Comma); break;
                         case ':': SetLexeme(Lexeme.Colon); break;
                         case ';': SetLexeme(Lexeme.Semicolon); break;
@@ -118,8 +128,16 @@ namespace Quirk
                                 default: Lexeme = Lexeme.Assignment; break;
                             }
                             break;
-                        case '(': SetLexeme(Lexeme.LeftParenthesis); break;
-                        case ')': SetLexeme(Lexeme.RightParenthesis); break;
+                        case '(':
+                            SetLexeme(Lexeme.LeftParenthesis);
+                            ignoreNewLine += 1;
+                            break;
+                        case ')':
+                            SetLexeme(Lexeme.RightParenthesis);
+                            if (ignoreNewLine > 0) {
+                                ignoreNewLine -= 1;
+                            }
+                            break;
                         case '+':
                             reader.Next();
                             switch (reader.Value) {

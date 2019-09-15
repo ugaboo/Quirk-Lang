@@ -2,7 +2,8 @@
 
 namespace Quirk.Tests
 {
-    [TestClass()] public class ReaderTests
+    [TestClass()]
+    public class ReaderTests
     {
         void Check(Reader reader, string lineValue, char value, int line, int column)
         {
@@ -16,14 +17,16 @@ namespace Quirk.Tests
             reader.Next();
         }
 
-        [TestMethod()] public void EmptyFile()
+        [TestMethod()]
+        public void EmptyFile()
         {
             var reader = new Reader("Code/Reader/Empty.qk");
             Check(reader, "", char.MaxValue, 1, 1);
             Check(reader, "", char.MaxValue, 1, 1);
         }
 
-        [TestMethod()] public void Letters()
+        [TestMethod()]
+        public void Letters()
         {
             var reader = new Reader("Code/Reader/Letters.qk");
             Check(reader, "abc", 'a', 1, 1);
@@ -32,7 +35,8 @@ namespace Quirk.Tests
             Check(reader, "abc", char.MaxValue, 1, 4);
         }
 
-        [TestMethod()] public void Newline()
+        [TestMethod()]
+        public void Newline()
         {
             var reader = new Reader("Code/Reader/Newline/Win.qk");
             Check(reader, "", '\r', 1, 1);
@@ -47,7 +51,8 @@ namespace Quirk.Tests
             Check(reader, "", char.MaxValue, 2, 1);
         }
 
-        [TestMethod()] public void Tab()
+        [TestMethod()]
+        public void Tab()
         {
             var reader = new Reader("Code/Reader/Tab.qk");
             Check(reader, "\t1", '\t', 1, 1);
@@ -80,7 +85,8 @@ namespace Quirk.Tests
             Check(reader, "\t55\t5", char.MaxValue, 5, 10);
         }
 
-        [TestMethod()] public void Text()
+        [TestMethod()]
+        public void Text()
         {
             var reader = new Reader("Code/Reader/Text.qk");
             Check(reader, "7@", '7', 1, 1);

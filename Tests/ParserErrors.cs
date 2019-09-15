@@ -30,5 +30,8 @@ namespace Quirk.Tests
         [TestMethod()] public void ShiftExpr() { Test("ShiftExpr"); }
         [TestMethod()] public void ArithExpr() { Test("ArithExpr"); }
         [TestMethod()] public void Term() { Test("Term"); }
+        [TestMethod()] public void Factor() { Test("Factor"); }
+        [TestMethod()] public void Power() { Test("Power"); }
+        [TestMethod()] public void AtomParenthesis() { Test("AtomParenthesis"); }
     }
 }

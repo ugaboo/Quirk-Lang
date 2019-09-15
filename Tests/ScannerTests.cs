@@ -3,9 +3,11 @@ using static Quirk.Lexeme;
 
 namespace Quirk.Tests
 {
-    [TestClass()] public class ScannerTests
+    [TestClass()]
+    public class ScannerTests
     {
-        [TestMethod()] public void Operators()
+        [TestMethod()]
+        public void Operators()
         {
             var scan = new Scanner("Code/Scanner/Operators.qk");
             Assert.AreEqual(LeftParenthesis, scan.Lexeme);
@@ -63,7 +65,8 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()] public void Keywords()
+        [TestMethod()]
+        public void Keywords()
         {
             var scan = new Scanner("Code/Scanner/Keywords.qk");
             Assert.AreEqual(KwAnd, scan.Lexeme);
@@ -83,7 +86,8 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()] public void Names()
+        [TestMethod()]
+        public void Names()
         {
             var scan = new Scanner("Code/Scanner/Names.qk");
             Assert.AreEqual(Id, scan.Lexeme);
@@ -98,7 +102,8 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()] public void Indents()
+        [TestMethod()]
+        public void Indents()
         {
             var scan = new Scanner("Code/Scanner/Indents.qk");
             Assert.AreEqual(Id, scan.Lexeme);
@@ -144,7 +149,8 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()] public void Integers()
+        [TestMethod()]
+        public void Integers()
         {
             var scan = new Scanner("Code/Scanner/Integers.qk");
             Assert.AreEqual(Int, scan.Lexeme);
@@ -153,7 +159,8 @@ namespace Quirk.Tests
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 
-        [TestMethod()] public void Floats()
+        [TestMethod()]
+        public void Floats()
         {
             var scan = new Scanner("Code/Scanner/Floats.qk");
             Assert.AreEqual(Float, scan.Lexeme);
@@ -164,6 +171,43 @@ namespace Quirk.Tests
             scan.Next();
             Assert.AreEqual(Float, scan.Lexeme);
             Assert.AreEqual(.001f, scan.ToSingle());
+            scan.Next();
+            Assert.AreEqual(EndMarker, scan.Lexeme);
+        }
+
+        [TestMethod()]
+        public void NewLines()
+        {
+            var scan = new Scanner("Code/Scanner/NewLines.qk");
+            Assert.AreEqual(RightParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(LeftParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(RightParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(LeftParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(RightParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(LeftParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(LeftParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(LeftParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(RightParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(RightParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(RightParenthesis, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
