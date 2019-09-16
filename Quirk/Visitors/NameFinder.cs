@@ -1,16 +1,15 @@
-﻿using Quirk.AST;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using NameTable = System.Collections.Generic.Dictionary<string, Quirk.AST.IProgObj>;
 
 namespace Quirk.Visitors
 {
-    public partial class NameFinder : IVisitor
+    public partial class NameFinder : AST.IVisitor
     {
         Stack<NameTable> nameTables = new Stack<NameTable>();
 
 
-        IProgObj Find(string name)
+        AST.IProgObj Find(string name)
         {
             foreach (var table in nameTables) {
                 if (table.TryGetValue(name, out var obj)) {
@@ -20,9 +19,9 @@ namespace Quirk.Visitors
             return null;
         }
 
-        void Replace(ref IProgObj obj)
+        void Replace(ref AST.IProgObj obj)
         {
-            if (obj is NamedObj named) {
+            if (obj is AST.NamedObj named) {
                 obj = Find(named.Name);
                 if (obj == null) {
                     throw new Exception("Object not found");
@@ -33,7 +32,7 @@ namespace Quirk.Visitors
         }
 
 
-        public void Visit(Module module)
+        public void Visit(AST.Module module)
         {
             nameTables.Push(module.NameTable);
 
@@ -44,7 +43,7 @@ namespace Quirk.Visitors
             nameTables.Pop();
         }
 
-        public void Visit(Func func)
+        public void Visit(AST.Func func)
         {
             nameTables.Push(func.NameTable);
 
@@ -55,17 +54,22 @@ namespace Quirk.Visitors
             nameTables.Pop();
         }
 
-        public void Visit(Variable variable) { }
+        public void Visit(AST.Variable variable) { }
 
-        public void Visit(Intrinsic intrinsic) { }
+        public void Visit(AST.Intrinsic intrinsic) { }
 
-
-        public void Visit(Assignment assignment)
+        public void Visit(AST.Tuple tuple)
         {
-            if (assignment.Left is NamedObj named) {
+            throw new Exception();
+        }
+
+
+        public void Visit(AST.Assignment assignment)
+        {
+            if (assignment.Left is AST.NamedObj named) {
                 assignment.Left = Find(named.Name);
                 if (assignment.Left == null) {
-                    var variable = new Variable(named.Name);
+                    var variable = new AST.Variable(named.Name);
                     nameTables.Peek()[variable.Name] = variable;
                     assignment.Left = variable;
                 }
@@ -76,24 +80,24 @@ namespace Quirk.Visitors
             Replace(ref assignment.Right);
         }
 
-        public void Visit(Evaluation evaluation)
+        public void Visit(AST.Evaluation evaluation)
         {
             Replace(ref evaluation.Expr);
         }
 
 
-        public void Visit(BinaryExpression expression)
+        public void Visit(AST.BinaryExpression expression)
         {
             Replace(ref expression.Left);
             Replace(ref expression.Right);
         }
 
-        public void Visit(UnaryExpression expression)
+        public void Visit(AST.UnaryExpression expression)
         {
             Replace(ref expression.Expr);
         }
 
-        public void Visit(FuncCall funcCall)
+        public void Visit(AST.FuncCall funcCall)
         {
             Replace(ref funcCall.Func);
 
@@ -105,15 +109,15 @@ namespace Quirk.Visitors
             }
         }
 
-        public void Visit(NamedObj namedObj)
+        public void Visit(AST.NamedObj namedObj)
         {
             throw new Exception();
         }
 
-        public void Visit(ConstBool constBool) { }
+        public void Visit(AST.ConstBool constBool) { }
 
-        public void Visit(ConstInt constInt) { }
+        public void Visit(AST.ConstInt constInt) { }
 
-        public void Visit(ConstFloat constFloat) { }
+        public void Visit(AST.ConstFloat constFloat) { }
     }
 }

@@ -1,0 +1,12 @@
+﻿def a():
+	pass
+
+def b():
+	def c():
+		pass
+
+def c(x):
+	pass
+
+def d(x, y,):
+	pass

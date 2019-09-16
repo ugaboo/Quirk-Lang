@@ -530,6 +530,7 @@ namespace Quirk
             }
             expr = null;
             return false;
+
         //_1:
         //    if (Atom()) {
         //        goto _2;
@@ -582,6 +583,7 @@ namespace Quirk
             if (TestlistComp(out obj)) {
                 goto _2;
             }
+            obj = new AST.Tuple();
             goto _2;
         _2:
             if (scan.Lexeme == Lexeme.RightParenthesis) {
@@ -717,12 +719,12 @@ namespace Quirk
                 scan.Next();
                 goto _2;
             }
-            throw new CompilationError(ErrorType.InvalidSyntax);
+            throw new CompilationError(ErrorType.ExpectedAnIndentedBlock);
         _2:
             if (Stmnt(nameTable, statements)) {
                 goto _3;
             }
-            throw new CompilationError(ErrorType.InvalidSyntax);
+            throw new CompilationError(ErrorType.InvalidSyntax);        // unreachable
         _3:
             if (Stmnt(nameTable, statements)) {
                 goto _3;
@@ -735,7 +737,7 @@ namespace Quirk
                 scan.Next();
                 goto _end;
             }
-            throw new CompilationError(ErrorType.InvalidSyntax);
+            throw new CompilationError(ErrorType.InvalidSyntax);        // unreachable
         _end:
             return true;
         }
@@ -850,16 +852,16 @@ namespace Quirk
             param = null;
             return false;
         _1:
-            if (scan.Lexeme == Lexeme.Colon) {
-                scan.Next();
-                goto _2;
-            }
+            //if (scan.Lexeme == Lexeme.Colon) {
+            //    scan.Next();
+            //    goto _2;
+            //}
             goto _end;
-        _2:
-            if (Test(out var expr)) {
-                goto _end;
-            }
-            throw new CompilationError(ErrorType.InvalidSyntax);
+        //_2:
+        //    if (Test(out var expr)) {
+        //        goto _end;
+        //    }
+        //    throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
             return true;
         }

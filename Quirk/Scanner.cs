@@ -19,6 +19,8 @@ namespace Quirk
         Reader reader;
 
         Stack<int> indentation = new Stack<int>();
+        int indent;
+
         int ignoreNewLine;
 
         StringBuilder textValue, intPart, floatPart, expPart;
@@ -80,6 +82,7 @@ namespace Quirk
                                 SetLexeme(Lexeme.Ignore);
                             } else {
                                 SetLexeme(Lexeme.NewLine);
+                                indent = 0;
                             }
                             break;
                         case '#':
@@ -203,8 +206,6 @@ namespace Quirk
 
         void Indentation()
         {
-            var indent = 0;
-
             while (true) {
                 if (reader.Value == ' ') {
                     indent += 1;
@@ -228,11 +229,8 @@ namespace Quirk
                 indentation.Push(indent);
                 Lexeme = Lexeme.Indent;
             } else if (indent < indentation.Peek()) {
-                do {
-                    indentation.Pop();
-                } while (indent < indentation.Peek());
-
-                if (indent == indentation.Peek()) {
+                indentation.Pop();
+                if (indent <= indentation.Peek()) {
                     Lexeme = Lexeme.Dedent;
                 } else {
                     throw new CompilationError(ErrorType.ExpectedAnIndentedBlock);

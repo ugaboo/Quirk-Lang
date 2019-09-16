@@ -357,7 +357,7 @@ namespace Quirk.Tests
         public void AtomSimple()
         {
             new Parser("Code/Parser/AtomSimple.qk", "AtomSimple", out var module);
-            Assert.AreEqual(5, module.Statements.Count);
+            Assert.AreEqual(6, module.Statements.Count);
 
             var evaluation = (AST.Evaluation)module.Statements[0];
             Assert.AreEqual("some_id", ((AST.NamedObj)evaluation.Expr).Name);
@@ -373,6 +373,9 @@ namespace Quirk.Tests
 
             evaluation = (AST.Evaluation)module.Statements[4];
             Assert.AreEqual(false, ((AST.ConstBool)evaluation.Expr).Value);
+
+            evaluation = (AST.Evaluation)module.Statements[5];
+            Assert.AreEqual(true, evaluation.Expr is AST.Tuple);
         }
 
         [TestMethod()]
@@ -395,9 +398,89 @@ namespace Quirk.Tests
             Assert.AreEqual("d", ((AST.NamedObj)right.Right).Name);
         }
 
-        //[TestMethod()] public void Functions()
-        //{
-        //    new Parser("Code/Parser/Functions.qk", "Functions", out var module);
-        //}
+        [TestMethod()]
+        public void Trailer()
+        {
+            new Parser("Code/Parser/Trailer.qk", "Trailer", out var module);
+            Assert.AreEqual(3, module.Statements.Count);
+
+            var evaluation = (AST.Evaluation)module.Statements[0];
+            var call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("f", ((AST.NamedObj)call.Func).Name);
+            Assert.AreEqual(0, call.Args.Count);
+
+            evaluation = (AST.Evaluation)module.Statements[1];
+            call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("g", ((AST.NamedObj)call.Func).Name);
+            Assert.AreEqual(1, call.Args.Count);
+            Assert.AreEqual("x", ((AST.NamedObj)call.Args[0]).Name);
+
+            evaluation = (AST.Evaluation)module.Statements[2];
+            call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("h", ((AST.NamedObj)call.Func).Name);
+            Assert.AreEqual(2, call.Args.Count);
+            Assert.AreEqual("y", ((AST.NamedObj)call.Args[0]).Name);
+            Assert.AreEqual(1, ((AST.ConstInt)call.Args[1]).Value);
+        }
+
+        [TestMethod()]
+        public void FuncDef()
+        {
+            new Parser("Code/Parser/FuncDef.qk", "FuncDef", out var module);
+            Assert.AreEqual(0, module.Statements.Count);
+
+            var func = (AST.Func)module.NameTable["a"];
+            Assert.AreEqual(0, func.Parameters.Count);
+            Assert.AreEqual(0, func.Statements.Count);
+            Assert.AreEqual(0, func.NameTable.Count);
+
+            func = (AST.Func)module.NameTable["b"];
+            Assert.AreEqual(0, func.Parameters.Count);
+            Assert.AreEqual(0, func.Statements.Count);
+            Assert.AreEqual(1, func.NameTable.Count);
+            var inner = (AST.Func)func.NameTable["c"];
+            Assert.AreEqual(0, inner.Parameters.Count);
+            Assert.AreEqual(0, inner.Statements.Count);
+            Assert.AreEqual(0, inner.NameTable.Count);
+
+            func = (AST.Func)module.NameTable["c"];
+            Assert.AreEqual(1, func.Parameters.Count);
+            Assert.AreEqual(0, func.Statements.Count);
+            Assert.AreEqual(0, func.NameTable.Count);
+            var param = (AST.Variable)func.Parameters[0];
+            Assert.AreEqual("x", param.Name);
+
+            func = (AST.Func)module.NameTable["d"];
+            Assert.AreEqual(2, func.Parameters.Count);
+            Assert.AreEqual(0, func.Statements.Count);
+            Assert.AreEqual(0, func.NameTable.Count);
+            param = (AST.Variable)func.Parameters[0];
+            Assert.AreEqual("x", param.Name);
+            param = (AST.Variable)func.Parameters[1];
+            Assert.AreEqual("y", param.Name);
+        }
+
+        [TestMethod()]
+        public void Suite()
+        {
+            new Parser("Code/Parser/Suite.qk", "Suite", out var module);
+            Assert.AreEqual(0, module.Statements.Count);
+
+            var func = (AST.Func)module.NameTable["a"];
+            Assert.AreEqual(0, func.Parameters.Count);
+            Assert.AreEqual(0, func.Statements.Count);
+            Assert.AreEqual(0, func.NameTable.Count);
+
+            func = (AST.Func)module.NameTable["b"];
+            Assert.AreEqual(0, func.Parameters.Count);
+            Assert.AreEqual(2, func.Statements.Count);
+            Assert.AreEqual(0, func.NameTable.Count);
+            var expr = (AST.Assignment)func.Statements[0];
+            Assert.AreEqual("x", ((AST.NamedObj)expr.Left).Name);
+            Assert.AreEqual(1, ((AST.ConstInt)expr.Right).Value);
+            expr = (AST.Assignment)func.Statements[1];
+            Assert.AreEqual("y", ((AST.NamedObj)expr.Left).Name);
+            Assert.AreEqual(2, ((AST.ConstInt)expr.Right).Value);
+        }
     }
 }

@@ -106,39 +106,73 @@ namespace Quirk.Tests
         public void Indents()
         {
             var scan = new Scanner("Code/Scanner/Indents.qk");
+            // ·# comment¶
+            // x¶
             Assert.AreEqual(Id, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(NewLine, scan.Lexeme);
             scan.Next();
+            // ··x¶
             Assert.AreEqual(Indent, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(Id, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(NewLine, scan.Lexeme);
             scan.Next();
+            // ··x¶
             Assert.AreEqual(Id, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(NewLine, scan.Lexeme);
             scan.Next();
+            // → x¶
             Assert.AreEqual(Indent, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(Id, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(NewLine, scan.Lexeme);
             scan.Next();
+            // ··# comment¶
+            // ····x¶
             Assert.AreEqual(Id, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(NewLine, scan.Lexeme);
             scan.Next();
+            // ··x¶
             Assert.AreEqual(Dedent, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(Id, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(NewLine, scan.Lexeme);
             scan.Next();
+            // ¶
+            // ··x¶
             Assert.AreEqual(Id, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(NewLine, scan.Lexeme);
+            scan.Next();
+            // x¶
+            Assert.AreEqual(Dedent, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(Id, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme);
+            scan.Next();
+            // → x¶
+            Assert.AreEqual(Indent, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(Id, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme);
+            scan.Next();
+            // → → x¶
+            Assert.AreEqual(Indent, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(Id, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme);
+            scan.Next();
+            // x
+            Assert.AreEqual(Dedent, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(Dedent, scan.Lexeme);
             scan.Next();

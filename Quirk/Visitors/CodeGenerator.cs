@@ -61,6 +61,8 @@ namespace Quirk.Visitors
             }
         }
 
+        public void Visit(AST.Tuple tuple) { }
+
 
         public void Visit(AST.Assignment assignment)
         {

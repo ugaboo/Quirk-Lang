@@ -6,6 +6,7 @@
         void Visit(Func func);
         void Visit(Variable variable);
         void Visit(Intrinsic intrinsic);
+        void Visit(Tuple tuple);
 
         void Visit(Assignment assignment);
         void Visit(Evaluation evaluation);
