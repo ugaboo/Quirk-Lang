@@ -2,19 +2,19 @@
 {
     public enum UnaryExpressionType { Plus, Minus, BitNot, Not, }
 
-    public class UnaryExpression : IProgObj
+    public class UnaryExpression : ProgObj
     {
         public readonly UnaryExpressionType Type;
-        public IProgObj Expr;
+        public ProgObj Expr;
 
 
-        public UnaryExpression(UnaryExpressionType type, IProgObj expr)
+        public UnaryExpression(UnaryExpressionType type, ProgObj expr)
         {
             Type = type;
             Expr = expr;
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

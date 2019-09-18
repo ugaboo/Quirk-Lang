@@ -2,10 +2,10 @@
 
 namespace Quirk.AST
 {
-    public class Module : IProgObj
+    public class Module : ProgObj
     {
-        public readonly Dictionary<string, IProgObj> NameTable = new Dictionary<string, IProgObj>();
-        public readonly List<IProgObj> Statements = new List<IProgObj>();
+        public readonly Dictionary<string, ProgObj> NameTable = new Dictionary<string, ProgObj>();
+        public readonly List<ProgObj> Statements = new List<ProgObj>();
 
         public readonly string Name;
 
@@ -17,7 +17,7 @@ namespace Quirk.AST
             NameTable["print"] = new Intrinsic("print", IntrinsicType.Print);
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

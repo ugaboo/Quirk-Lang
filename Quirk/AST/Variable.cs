@@ -1,6 +1,6 @@
 ﻿namespace Quirk.AST
 {
-    public class Variable : IProgObj
+    public class Variable : ProgObj
     {
         public readonly string Name;
 
@@ -10,7 +10,7 @@
             Name = name;
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

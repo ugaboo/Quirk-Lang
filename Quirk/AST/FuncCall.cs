@@ -2,24 +2,24 @@
 
 namespace Quirk.AST
 {
-    public class FuncCall : IProgObj
+    public class FuncCall : ProgObj
     {
-        public IProgObj Func;
-        public readonly List<IProgObj> Args = new List<IProgObj>();
+        public ProgObj Func;
+        public readonly List<ProgObj> Args = new List<ProgObj>();
 
 
-        public FuncCall(IProgObj func)
+        public FuncCall(ProgObj func)
         {
             Func = func;
         }
 
-        public FuncCall(IProgObj func, List<IProgObj> args)
+        public FuncCall(ProgObj func, List<ProgObj> args)
         {
             Func = func;
             Args.AddRange(args);
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

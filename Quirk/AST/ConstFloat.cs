@@ -1,6 +1,6 @@
 ﻿namespace Quirk.AST
 {
-    public class ConstFloat : IProgObj
+    public class ConstFloat : ProgObj
     {
         public readonly float Value;
 
@@ -9,7 +9,7 @@
             Value = value;
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

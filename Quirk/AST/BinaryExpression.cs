@@ -5,21 +5,21 @@
         Less, Greater, Equal, LessOrEqual, GreaterOrEqual, NotEqual, And, Or,
     }
 
-    public class BinaryExpression : IProgObj
+    public class BinaryExpression : ProgObj
     {
         public readonly BinaryExpressionType Type;
-        public IProgObj Left;
-        public IProgObj Right;
+        public ProgObj Left;
+        public ProgObj Right;
 
 
-        public BinaryExpression(BinaryExpressionType type, IProgObj left, IProgObj right)
+        public BinaryExpression(BinaryExpressionType type, ProgObj left, ProgObj right)
         {
             Type = type;
             Left = left;
             Right = right;
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

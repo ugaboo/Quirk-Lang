@@ -2,11 +2,11 @@
 
 namespace Quirk.AST
 {
-    public class Func : IProgObj
+    public class Func : ProgObj
     {
-        public readonly Dictionary<string, IProgObj> NameTable = new Dictionary<string, IProgObj>();
-        public readonly List<IProgObj> Statements = new List<IProgObj>();
-        public readonly List<IProgObj> Parameters = new List<IProgObj>();
+        public readonly Dictionary<string, ProgObj> NameTable = new Dictionary<string, ProgObj>();
+        public readonly List<ProgObj> Statements = new List<ProgObj>();
+        public readonly List<ProgObj> Parameters = new List<ProgObj>();
 
         public readonly string Name;
 
@@ -16,7 +16,7 @@ namespace Quirk.AST
             Name = name;
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

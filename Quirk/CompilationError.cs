@@ -10,6 +10,7 @@ namespace Quirk
         UnexpectedToken,
         ExpectedAnIndentedBlock,
         InvalidSyntax,
+        DuplicateParameter,
     }
 
     public class CompilationError : Exception

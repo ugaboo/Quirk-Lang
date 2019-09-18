@@ -1,16 +1,16 @@
 ﻿namespace Quirk.AST
 {
-    public class Evaluation : IProgObj
+    public class Evaluation : ProgObj
     {
-        public IProgObj Expr;
+        public ProgObj Expr;
 
 
-        public Evaluation(IProgObj expr)
+        public Evaluation(ProgObj expr)
         {
             Expr = expr;
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

@@ -25,6 +25,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Code\FuncParamsProcessor\ParameterOverlap.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\FuncParamsProcessor\CopyParamsToNameTable.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\FuncParamsProcessor\Errors\DuplicateParameter.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\NameFinder\Test.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Code\Parser\Errors\AtomParenthesis.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

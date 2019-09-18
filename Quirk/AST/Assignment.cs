@@ -1,18 +1,18 @@
 ﻿namespace Quirk.AST
 {
-    public class Assignment : IProgObj
+    public class Assignment : ProgObj
     {
-        public IProgObj Left;
-        public IProgObj Right;
+        public ProgObj Left;
+        public ProgObj Right;
 
 
-        public Assignment(IProgObj left, IProgObj right)
+        public Assignment(ProgObj left, ProgObj right)
         {
             Left = left;
             Right = right;
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

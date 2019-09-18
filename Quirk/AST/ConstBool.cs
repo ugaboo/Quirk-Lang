@@ -1,6 +1,6 @@
 ﻿namespace Quirk.AST
 {
-    public class ConstBool : IProgObj
+    public class ConstBool : ProgObj
     {
         public readonly bool Value;
 
@@ -9,7 +9,7 @@
             Value = value;
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Quirk.Visitors
 {
-    public partial class CodeGenerator : AST.IVisitor
+    public partial class CodeGenerator : AST.Visitor
     {
         LLVMBuilderRef builder = LLVM.CreateBuilder();
 
@@ -12,10 +12,10 @@ namespace Quirk.Visitors
 
         LLVMValueRef d;
 
-        Dictionary<AST.IProgObj, LLVMValueRef> registers = new Dictionary<AST.IProgObj, LLVMValueRef>();
+        Dictionary<AST.ProgObj, LLVMValueRef> registers = new Dictionary<AST.ProgObj, LLVMValueRef>();
 
 
-        public void Visit(AST.Module module)
+        public override void Visit(AST.Module module)
         {
             moduleLLVM = LLVM.ModuleCreateWithName(module.Name);
 
@@ -35,11 +35,18 @@ namespace Quirk.Visitors
             LLVM.PrintModuleToFile(moduleLLVM, $"{module.Name}.ll", out var errorMsg);
         }
 
-        public void Visit(AST.Func func)
+        public override void Visit(AST.Overload overload)
+        {
+            foreach (var func in overload.Funcs) {
+                func.Accept(this);
+            }
+        }
+
+        public override void Visit(AST.Func func)
         {
         }
 
-        public void Visit(AST.Variable variable)
+        public override void Visit(AST.Variable variable)
         {
             var variableLLVM = LLVM.AddGlobal(moduleLLVM, LLVM.Int32Type(), variable.Name);
             LLVM.SetLinkage(variableLLVM, LLVMLinkage.LLVMCommonLinkage);
@@ -47,7 +54,7 @@ namespace Quirk.Visitors
             registers[variable] = variableLLVM;
         }
 
-        public void Visit(AST.Intrinsic intrinsic)
+        public override void Visit(AST.Intrinsic intrinsic)
         {
             switch (intrinsic.Type) {
                 case AST.IntrinsicType.Print:
@@ -61,10 +68,10 @@ namespace Quirk.Visitors
             }
         }
 
-        public void Visit(AST.Tuple tuple) { }
+        public override void Visit(AST.Tuple tuple) { }
 
 
-        public void Visit(AST.Assignment assignment)
+        public override void Visit(AST.Assignment assignment)
         {
             assignment.Left.Accept(this);
             assignment.Right.Accept(this);
@@ -72,13 +79,13 @@ namespace Quirk.Visitors
             registers[assignment] = LLVM.BuildStore(builder, registers[assignment.Right], registers[assignment.Left]);
         }
 
-        public void Visit(AST.Evaluation evaluation)
+        public override void Visit(AST.Evaluation evaluation)
         {
             evaluation.Expr.Accept(this);
         }
 
 
-        public void Visit(AST.BinaryExpression expression)
+        public override void Visit(AST.BinaryExpression expression)
         {
             expression.Left.Accept(this);
             expression.Right.Accept(this);
@@ -92,11 +99,11 @@ namespace Quirk.Visitors
             }
         }
 
-        public void Visit(AST.UnaryExpression expression)
+        public override void Visit(AST.UnaryExpression expression)
         {
         }
 
-        public void Visit(AST.FuncCall funcCall)
+        public override void Visit(AST.FuncCall funcCall)
         {
             if (funcCall.Func is AST.Intrinsic intrinsic) {
                 var args = new LLVMValueRef[funcCall.Args.Count + 1];
@@ -112,18 +119,13 @@ namespace Quirk.Visitors
             }
         }
 
-        public void Visit(AST.NamedObj namedObj)
-        {
-            throw new Exception();
-        }
+        public override void Visit(AST.ConstBool constBool) { }
 
-        public void Visit(AST.ConstBool constBool) { }
-
-        public void Visit(AST.ConstInt constInt)
+        public override void Visit(AST.ConstInt constInt)
         {
             registers[constInt] = LLVM.ConstInt(LLVM.Int32Type(), (ulong)constInt.Value, false);
         }
 
-        public void Visit(AST.ConstFloat constFloat) { }
+        public override void Visit(AST.ConstFloat constFloat) { }
     }
 }

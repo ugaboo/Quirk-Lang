@@ -1,0 +1,9 @@
+﻿a = 1
+def f(x):
+	y = x + 1
+	def g():
+		pass
+	g()
+b = 2
+c = 3
+x = (a + b * c) / f(0)

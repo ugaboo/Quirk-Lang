@@ -2,7 +2,7 @@
 {
     public enum IntrinsicType { Print, }
 
-    public class Intrinsic : IProgObj
+    public class Intrinsic : ProgObj
     {
         public readonly string Name;
         public readonly IntrinsicType Type;
@@ -14,7 +14,7 @@
             Type = type;
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

@@ -1,12 +1,12 @@
 ﻿namespace Quirk.AST
 {
-    public class Tuple : IProgObj
+    public class Tuple : ProgObj
     {
         public Tuple()
         {
         }
 
-        public void Accept(IVisitor visitor)
+        public override void Accept(Visitor visitor)
         {
             visitor.Visit(this);
         }

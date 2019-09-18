@@ -429,28 +429,33 @@ namespace Quirk.Tests
             new Parser("Code/Parser/FuncDef.qk", "FuncDef", out var module);
             Assert.AreEqual(0, module.Statements.Count);
 
-            var func = (AST.Func)module.NameTable["a"];
+            var overload = (AST.Overload)module.NameTable["a"];
+            var func = overload.Funcs[0];
             Assert.AreEqual(0, func.Parameters.Count);
             Assert.AreEqual(0, func.Statements.Count);
             Assert.AreEqual(0, func.NameTable.Count);
 
-            func = (AST.Func)module.NameTable["b"];
+            overload = (AST.Overload)module.NameTable["b"];
+            func = overload.Funcs[0];
             Assert.AreEqual(0, func.Parameters.Count);
             Assert.AreEqual(0, func.Statements.Count);
             Assert.AreEqual(1, func.NameTable.Count);
-            var inner = (AST.Func)func.NameTable["c"];
-            Assert.AreEqual(0, inner.Parameters.Count);
-            Assert.AreEqual(0, inner.Statements.Count);
-            Assert.AreEqual(0, inner.NameTable.Count);
+            overload = (AST.Overload)func.NameTable["c"];       // inner function
+            func = overload.Funcs[0];
+            Assert.AreEqual(0, func.Parameters.Count);
+            Assert.AreEqual(0, func.Statements.Count);
+            Assert.AreEqual(0, func.NameTable.Count);
 
-            func = (AST.Func)module.NameTable["c"];
+            overload = (AST.Overload)module.NameTable["c"];     // outer function
+            func = overload.Funcs[0];
             Assert.AreEqual(1, func.Parameters.Count);
             Assert.AreEqual(0, func.Statements.Count);
             Assert.AreEqual(0, func.NameTable.Count);
             var param = (AST.Variable)func.Parameters[0];
             Assert.AreEqual("x", param.Name);
 
-            func = (AST.Func)module.NameTable["d"];
+            overload = (AST.Overload)module.NameTable["d"];
+            func = overload.Funcs[0];
             Assert.AreEqual(2, func.Parameters.Count);
             Assert.AreEqual(0, func.Statements.Count);
             Assert.AreEqual(0, func.NameTable.Count);
@@ -466,12 +471,14 @@ namespace Quirk.Tests
             new Parser("Code/Parser/Suite.qk", "Suite", out var module);
             Assert.AreEqual(0, module.Statements.Count);
 
-            var func = (AST.Func)module.NameTable["a"];
+            var overload = (AST.Overload)module.NameTable["a"];
+            var func = overload.Funcs[0];
             Assert.AreEqual(0, func.Parameters.Count);
             Assert.AreEqual(0, func.Statements.Count);
             Assert.AreEqual(0, func.NameTable.Count);
 
-            func = (AST.Func)module.NameTable["b"];
+            overload = (AST.Overload)module.NameTable["b"];
+            func = overload.Funcs[0];
             Assert.AreEqual(0, func.Parameters.Count);
             Assert.AreEqual(2, func.Statements.Count);
             Assert.AreEqual(0, func.NameTable.Count);

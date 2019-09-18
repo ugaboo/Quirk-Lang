@@ -4,9 +4,11 @@ using static Quirk.Lexeme;
 
 namespace Quirk.Tests
 {
-    [TestClass()] public class ScannerErrors
+    [TestClass()]
+    public class ScannerErrors
     {
-        [TestMethod()] public void Indents()
+        [TestMethod()]
+        public void Indents()
         {
             var scan = new Scanner("Code/Scanner/Errors/Indents.qk");
             Assert.AreEqual(Indent, scan.Lexeme);
