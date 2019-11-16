@@ -46,23 +46,23 @@ namespace Quirk.Tests
             Assert.AreEqual(2, ((AST.ConstInt)evaluation.Expr).Value);
 
             var assignment = (AST.Assignment)module.Statements[1];
-            Assert.AreEqual("x", ((AST.NamedObj)assignment.Left).Name);
+            Assert.AreEqual("x", ((AST.NameObj)assignment.Left).Name);
             Assert.AreEqual(0, ((AST.ConstInt)assignment.Right).Value);
 
             assignment = (AST.Assignment)module.Statements[2];
-            Assert.AreEqual("z", ((AST.NamedObj)assignment.Left).Name);
+            Assert.AreEqual("z", ((AST.NameObj)assignment.Left).Name);
             Assert.AreEqual(1, ((AST.ConstInt)assignment.Right).Value);
 
             var z = assignment.Left;
 
             assignment = (AST.Assignment)module.Statements[3];
-            Assert.AreEqual("y", ((AST.NamedObj)assignment.Left).Name);
+            Assert.AreEqual("y", ((AST.NameObj)assignment.Left).Name);
             Assert.AreEqual(z, assignment.Right);
 
             var y = assignment.Left;
 
             assignment = (AST.Assignment)module.Statements[4];
-            Assert.AreEqual("x", ((AST.NamedObj)assignment.Left).Name);       // NamedObj for 'x' was created anew in the Atom method
+            Assert.AreEqual("x", ((AST.NameObj)assignment.Left).Name);       // NamedObj for 'x' was created anew in the Atom method
             Assert.AreEqual(y, assignment.Right);
         }
 
@@ -74,15 +74,15 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.Or, expr1.Type);
+            var or2 = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__or__", ((AST.NameObj)or2.Func).Name);
 
-            var expr2 = (AST.BinaryExpression)expr1.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.Or, expr2.Type);
+            var or1 = (AST.FuncCall)or2.Args[0];
+            Assert.AreEqual("__or__", ((AST.NameObj)or1.Func).Name);
 
-            Assert.AreEqual(true, ((AST.ConstBool)expr2.Left).Value);
-            Assert.AreEqual(false, ((AST.ConstBool)expr2.Right).Value);
-            Assert.AreEqual(true, ((AST.ConstBool)expr1.Right).Value);
+            Assert.AreEqual(true, ((AST.ConstBool)or1.Args[0]).Value);
+            Assert.AreEqual(false, ((AST.ConstBool)or1.Args[1]).Value);
+            Assert.AreEqual(true, ((AST.ConstBool)or2.Args[1]).Value);
         }
 
         [TestMethod()]
@@ -93,15 +93,15 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.And, expr1.Type);
+            var and2 = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__and__", ((AST.NameObj)and2.Func).Name);
 
-            var expr2 = (AST.BinaryExpression)expr1.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.And, expr2.Type);
+            var and1 = (AST.FuncCall)and2.Args[0];
+            Assert.AreEqual("__and__", ((AST.NameObj)and1.Func).Name);
 
-            Assert.AreEqual(false, ((AST.ConstBool)expr2.Left).Value);
-            Assert.AreEqual(true, ((AST.ConstBool)expr2.Right).Value);
-            Assert.AreEqual(false, ((AST.ConstBool)expr1.Right).Value);
+            Assert.AreEqual(false, ((AST.ConstBool)and1.Args[0]).Value);
+            Assert.AreEqual(true, ((AST.ConstBool)and1.Args[1]).Value);
+            Assert.AreEqual(false, ((AST.ConstBool)and2.Args[1]).Value);
         }
 
         [TestMethod()]
@@ -112,13 +112,13 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = (AST.UnaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.UnaryExpressionType.Not, expr1.Type);
+            var not1 = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__not__", ((AST.NameObj)not1.Func).Name);
 
-            var expr2 = (AST.UnaryExpression)expr1.Expr;
-            Assert.AreEqual(AST.UnaryExpressionType.Not, expr2.Type);
+            var not2 = (AST.FuncCall)not1.Args[0];
+            Assert.AreEqual("__not__", ((AST.NameObj)not2.Func).Name);
 
-            Assert.AreEqual(true, ((AST.ConstBool)expr2.Expr).Value);
+            Assert.AreEqual(true, ((AST.ConstBool)not2.Args[0]).Value);
         }
 
         [TestMethod()]
@@ -128,40 +128,40 @@ namespace Quirk.Tests
             Assert.AreEqual(6, module.Statements.Count);
 
             var evaluation = (AST.Evaluation)module.Statements[0];
-            var expr = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.Less, expr.Type);
-            Assert.AreEqual(1, ((AST.ConstInt)expr.Left).Value);
-            Assert.AreEqual(2, ((AST.ConstInt)expr.Right).Value);
+            var call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__lt__", ((AST.NameObj)call.Func).Name);
+            Assert.AreEqual(1, ((AST.ConstInt)call.Args[0]).Value);
+            Assert.AreEqual(2, ((AST.ConstInt)call.Args[1]).Value);
 
             evaluation = (AST.Evaluation)module.Statements[1];
-            expr = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.Greater, expr.Type);
-            Assert.AreEqual(2, ((AST.ConstInt)expr.Left).Value);
-            Assert.AreEqual(1, ((AST.ConstInt)expr.Right).Value);
+            call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__gt__", ((AST.NameObj)call.Func).Name);
+            Assert.AreEqual(2, ((AST.ConstInt)call.Args[0]).Value);
+            Assert.AreEqual(1, ((AST.ConstInt)call.Args[1]).Value);
 
             evaluation = (AST.Evaluation)module.Statements[2];
-            expr = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.Equal, expr.Type);
-            Assert.AreEqual(1, ((AST.ConstInt)expr.Left).Value);
-            Assert.AreEqual(1, ((AST.ConstInt)expr.Right).Value);
+            call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__eq__", ((AST.NameObj)call.Func).Name);
+            Assert.AreEqual(1, ((AST.ConstInt)call.Args[0]).Value);
+            Assert.AreEqual(1, ((AST.ConstInt)call.Args[1]).Value);
 
             evaluation = (AST.Evaluation)module.Statements[3];
-            expr = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.LessOrEqual, expr.Type);
-            Assert.AreEqual(1, ((AST.ConstInt)expr.Left).Value);
-            Assert.AreEqual(2, ((AST.ConstInt)expr.Right).Value);
+            call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__le__", ((AST.NameObj)call.Func).Name);
+            Assert.AreEqual(1, ((AST.ConstInt)call.Args[0]).Value);
+            Assert.AreEqual(2, ((AST.ConstInt)call.Args[1]).Value);
 
             evaluation = (AST.Evaluation)module.Statements[4];
-            expr = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.GreaterOrEqual, expr.Type);
-            Assert.AreEqual(2, ((AST.ConstInt)expr.Left).Value);
-            Assert.AreEqual(1, ((AST.ConstInt)expr.Right).Value);
+            call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__ge__", ((AST.NameObj)call.Func).Name);
+            Assert.AreEqual(2, ((AST.ConstInt)call.Args[0]).Value);
+            Assert.AreEqual(1, ((AST.ConstInt)call.Args[1]).Value);
 
             evaluation = (AST.Evaluation)module.Statements[5];
-            expr = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.NotEqual, expr.Type);
-            Assert.AreEqual(1, ((AST.ConstInt)expr.Left).Value);
-            Assert.AreEqual(2, ((AST.ConstInt)expr.Right).Value);
+            call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__ne__", ((AST.NameObj)call.Func).Name);
+            Assert.AreEqual(1, ((AST.ConstInt)call.Args[0]).Value);
+            Assert.AreEqual(2, ((AST.ConstInt)call.Args[1]).Value);
         }
 
         [TestMethod()]
@@ -172,26 +172,26 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var rightAnd = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.And, rightAnd.Type);
+            var rightAnd = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__and__", ((AST.NameObj)rightAnd.Func).Name);
 
-            var leftAnd = (AST.BinaryExpression)rightAnd.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.And, leftAnd.Type);
+            var leftAnd = (AST.FuncCall)rightAnd.Args[0];
+            Assert.AreEqual("__and__", ((AST.NameObj)leftAnd.Func).Name);
 
-            var left = (AST.BinaryExpression)leftAnd.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.Less, left.Type);
-            Assert.AreEqual("x", ((AST.NamedObj)left.Left).Name);
-            Assert.AreEqual("y", ((AST.NamedObj)left.Right).Name);
+            var left = (AST.FuncCall)leftAnd.Args[0];
+            Assert.AreEqual("__lt__", ((AST.NameObj)left.Func).Name);
+            Assert.AreEqual("x", ((AST.NameObj)left.Args[0]).Name);
+            Assert.AreEqual("y", ((AST.NameObj)left.Args[1]).Name);
 
-            var center = (AST.BinaryExpression)leftAnd.Right;
-            Assert.AreEqual(AST.BinaryExpressionType.LessOrEqual, center.Type);
-            Assert.AreEqual("y", ((AST.NamedObj)center.Left).Name);
-            Assert.AreEqual("z", ((AST.NamedObj)center.Right).Name);
+            var center = (AST.FuncCall)leftAnd.Args[1];
+            Assert.AreEqual("__le__", ((AST.NameObj)center.Func).Name);
+            Assert.AreEqual("y", ((AST.NameObj)center.Args[0]).Name);
+            Assert.AreEqual("z", ((AST.NameObj)center.Args[1]).Name);
 
-            var right = (AST.BinaryExpression)rightAnd.Right;
-            Assert.AreEqual(AST.BinaryExpressionType.Greater, right.Type);
-            Assert.AreEqual("z", ((AST.NamedObj)right.Left).Name);
-            Assert.AreEqual("w", ((AST.NamedObj)right.Right).Name);
+            var right = (AST.FuncCall)rightAnd.Args[1];
+            Assert.AreEqual("__gt__", ((AST.NameObj)right.Func).Name);
+            Assert.AreEqual("z", ((AST.NameObj)right.Args[0]).Name);
+            Assert.AreEqual("w", ((AST.NameObj)right.Args[1]).Name);
         }
 
         [TestMethod()]
@@ -202,15 +202,15 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.BitOr, expr1.Type);
+            var call1 = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__bitor__", ((AST.NameObj)call1.Func).Name);
 
-            var expr2 = (AST.BinaryExpression)expr1.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.BitOr, expr2.Type);
+            var call2 = (AST.FuncCall)call1.Args[0];
+            Assert.AreEqual("__bitor__", ((AST.NameObj)call2.Func).Name);
 
-            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
-            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
-            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+            Assert.AreEqual("a", ((AST.NameObj)call2.Args[0]).Name);
+            Assert.AreEqual("b", ((AST.NameObj)call2.Args[1]).Name);
+            Assert.AreEqual("c", ((AST.NameObj)call1.Args[1]).Name);
         }
 
         [TestMethod()]
@@ -221,15 +221,15 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.BitXor, expr1.Type);
+            var call1 = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__bitxor__", ((AST.NameObj)call1.Func).Name);
 
-            var expr2 = (AST.BinaryExpression)expr1.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.BitXor, expr2.Type);
+            var call2 = (AST.FuncCall)call1.Args[0];
+            Assert.AreEqual("__bitxor__", ((AST.NameObj)call2.Func).Name);
 
-            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
-            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
-            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+            Assert.AreEqual("a", ((AST.NameObj)call2.Args[0]).Name);
+            Assert.AreEqual("b", ((AST.NameObj)call2.Args[1]).Name);
+            Assert.AreEqual("c", ((AST.NameObj)call1.Args[1]).Name);
         }
 
         [TestMethod()]
@@ -240,15 +240,15 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.BitAnd, expr1.Type);
+            var call1 = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__bitand__", ((AST.NameObj)call1.Func).Name);
 
-            var expr2 = (AST.BinaryExpression)expr1.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.BitAnd, expr2.Type);
+            var call2 = (AST.FuncCall)call1.Args[0];
+            Assert.AreEqual("__bitand__", ((AST.NameObj)call2.Func).Name);
 
-            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
-            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
-            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+            Assert.AreEqual("a", ((AST.NameObj)call2.Args[0]).Name);
+            Assert.AreEqual("b", ((AST.NameObj)call2.Args[1]).Name);
+            Assert.AreEqual("c", ((AST.NameObj)call1.Args[1]).Name);
         }
 
         [TestMethod()]
@@ -259,15 +259,15 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.RightShift, expr1.Type);
+            var call1 = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__rshift__", ((AST.NameObj)call1.Func).Name);
 
-            var expr2 = (AST.BinaryExpression)expr1.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.LeftShift, expr2.Type);
+            var call2 = (AST.FuncCall)call1.Args[0];
+            Assert.AreEqual("__lshift__", ((AST.NameObj)call2.Func).Name);
 
-            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
-            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
-            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+            Assert.AreEqual("a", ((AST.NameObj)call2.Args[0]).Name);
+            Assert.AreEqual("b", ((AST.NameObj)call2.Args[1]).Name);
+            Assert.AreEqual("c", ((AST.NameObj)call1.Args[1]).Name);
         }
         
         [TestMethod()]
@@ -278,15 +278,15 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.Sub, expr1.Type);
+            var sub = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__sub__", ((AST.NameObj)sub.Func).Name);
 
-            var expr2 = (AST.BinaryExpression)expr1.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.Add, expr2.Type);
+            var add = (AST.FuncCall)sub.Args[0];
+            Assert.AreEqual("__add__", ((AST.NameObj)add.Func).Name);
 
-            Assert.AreEqual("a", ((AST.NamedObj)expr2.Left).Name);
-            Assert.AreEqual("b", ((AST.NamedObj)expr2.Right).Name);
-            Assert.AreEqual("c", ((AST.NamedObj)expr1.Right).Name);
+            Assert.AreEqual("a", ((AST.NameObj)add.Args[0]).Name);
+            Assert.AreEqual("b", ((AST.NameObj)add.Args[1]).Name);
+            Assert.AreEqual("c", ((AST.NameObj)sub.Args[1]).Name);
         }
 
         [TestMethod()]
@@ -297,23 +297,23 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr1 = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.FloorDiv, expr1.Type);
+            var fdiv = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__floordiv__", ((AST.NameObj)fdiv.Func).Name);
 
-            var expr2 = (AST.BinaryExpression)expr1.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.Mod, expr2.Type);
+            var mod = (AST.FuncCall)fdiv.Args[0];
+            Assert.AreEqual("__mod__", ((AST.NameObj)mod.Func).Name);
 
-            var expr3 = (AST.BinaryExpression)expr2.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.Div, expr3.Type);
+            var div = (AST.FuncCall)mod.Args[0];
+            Assert.AreEqual("__truediv__", ((AST.NameObj)div.Func).Name);
 
-            var expr4 = (AST.BinaryExpression)expr3.Left;
-            Assert.AreEqual(AST.BinaryExpressionType.Mul, expr4.Type);
+            var mul = (AST.FuncCall)div.Args[0];
+            Assert.AreEqual("__mul__", ((AST.NameObj)mul.Func).Name);
 
-            Assert.AreEqual("a", ((AST.NamedObj)expr4.Left).Name);
-            Assert.AreEqual("b", ((AST.NamedObj)expr4.Right).Name);
-            Assert.AreEqual("c", ((AST.NamedObj)expr3.Right).Name);
-            Assert.AreEqual("d", ((AST.NamedObj)expr2.Right).Name);
-            Assert.AreEqual("e", ((AST.NamedObj)expr1.Right).Name);
+            Assert.AreEqual("a", ((AST.NameObj)mul.Args[0]).Name);
+            Assert.AreEqual("b", ((AST.NameObj)mul.Args[1]).Name);
+            Assert.AreEqual("c", ((AST.NameObj)div.Args[1]).Name);
+            Assert.AreEqual("d", ((AST.NameObj)mod.Args[1]).Name);
+            Assert.AreEqual("e", ((AST.NameObj)fdiv.Args[1]).Name);
         }
 
         [TestMethod()]
@@ -323,19 +323,19 @@ namespace Quirk.Tests
             Assert.AreEqual(3, module.Statements.Count);
 
             var evaluation = (AST.Evaluation)module.Statements[0];
-            var expr = (AST.UnaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.UnaryExpressionType.Plus, expr.Type);
-            Assert.AreEqual("x", ((AST.NamedObj)expr.Expr).Name);
+            var call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__pos__", ((AST.NameObj)call.Func).Name);
+            Assert.AreEqual("x", ((AST.NameObj)call.Args[0]).Name);
 
             evaluation = (AST.Evaluation)module.Statements[1];
-            expr = (AST.UnaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.UnaryExpressionType.Minus, expr.Type);
-            Assert.AreEqual("y", ((AST.NamedObj)expr.Expr).Name);
+            call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__neg__", ((AST.NameObj)call.Func).Name);
+            Assert.AreEqual("y", ((AST.NameObj)call.Args[0]).Name);
 
             evaluation = (AST.Evaluation)module.Statements[2];
-            expr = (AST.UnaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.UnaryExpressionType.BitNot, expr.Type);
-            Assert.AreEqual("z", ((AST.NamedObj)expr.Expr).Name);
+            call = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__invert__", ((AST.NameObj)call.Func).Name);
+            Assert.AreEqual("z", ((AST.NameObj)call.Args[0]).Name);
         }
 
         [TestMethod()]
@@ -346,11 +346,11 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var expr = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.Power, expr.Type);
+            var pow = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__pow__", ((AST.NameObj)pow.Func).Name);
 
-            Assert.AreEqual("x", ((AST.NamedObj)expr.Left).Name);
-            Assert.AreEqual(3, ((AST.ConstInt)expr.Right).Value);
+            Assert.AreEqual("x", ((AST.NameObj)pow.Args[0]).Name);
+            Assert.AreEqual(3, ((AST.ConstInt)pow.Args[1]).Value);
         }
 
         [TestMethod()]
@@ -360,7 +360,7 @@ namespace Quirk.Tests
             Assert.AreEqual(6, module.Statements.Count);
 
             var evaluation = (AST.Evaluation)module.Statements[0];
-            Assert.AreEqual("some_id", ((AST.NamedObj)evaluation.Expr).Name);
+            Assert.AreEqual("some_id", ((AST.NameObj)evaluation.Expr).Name);
 
             evaluation = (AST.Evaluation)module.Statements[1];
             Assert.AreEqual(10, ((AST.ConstInt)evaluation.Expr).Value);
@@ -386,16 +386,16 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
 
-            var center = (AST.BinaryExpression)evaluation.Expr;
-            Assert.AreEqual(AST.BinaryExpressionType.Mul, center.Type);
+            var mul = (AST.FuncCall)evaluation.Expr;
+            Assert.AreEqual("__mul__", ((AST.NameObj)mul.Func).Name);
 
-            var left = (AST.BinaryExpression)center.Left;
-            Assert.AreEqual("a", ((AST.NamedObj)left.Left).Name);
-            Assert.AreEqual("b", ((AST.NamedObj)left.Right).Name);
+            var add = (AST.FuncCall)mul.Args[0];
+            Assert.AreEqual("a", ((AST.NameObj)add.Args[0]).Name);
+            Assert.AreEqual("b", ((AST.NameObj)add.Args[1]).Name);
 
-            var right = (AST.BinaryExpression)center.Right;
-            Assert.AreEqual("c", ((AST.NamedObj)right.Left).Name);
-            Assert.AreEqual("d", ((AST.NamedObj)right.Right).Name);
+            var sub = (AST.FuncCall)mul.Args[1];
+            Assert.AreEqual("c", ((AST.NameObj)sub.Args[0]).Name);
+            Assert.AreEqual("d", ((AST.NameObj)sub.Args[1]).Name);
         }
 
         [TestMethod()]
@@ -406,20 +406,20 @@ namespace Quirk.Tests
 
             var evaluation = (AST.Evaluation)module.Statements[0];
             var call = (AST.FuncCall)evaluation.Expr;
-            Assert.AreEqual("f", ((AST.NamedObj)call.Func).Name);
+            Assert.AreEqual("f", ((AST.NameObj)call.Func).Name);
             Assert.AreEqual(0, call.Args.Count);
 
             evaluation = (AST.Evaluation)module.Statements[1];
             call = (AST.FuncCall)evaluation.Expr;
-            Assert.AreEqual("g", ((AST.NamedObj)call.Func).Name);
+            Assert.AreEqual("g", ((AST.NameObj)call.Func).Name);
             Assert.AreEqual(1, call.Args.Count);
-            Assert.AreEqual("x", ((AST.NamedObj)call.Args[0]).Name);
+            Assert.AreEqual("x", ((AST.NameObj)call.Args[0]).Name);
 
             evaluation = (AST.Evaluation)module.Statements[2];
             call = (AST.FuncCall)evaluation.Expr;
-            Assert.AreEqual("h", ((AST.NamedObj)call.Func).Name);
+            Assert.AreEqual("h", ((AST.NameObj)call.Func).Name);
             Assert.AreEqual(2, call.Args.Count);
-            Assert.AreEqual("y", ((AST.NamedObj)call.Args[0]).Name);
+            Assert.AreEqual("y", ((AST.NameObj)call.Args[0]).Name);
             Assert.AreEqual(1, ((AST.ConstInt)call.Args[1]).Value);
         }
 
@@ -427,67 +427,113 @@ namespace Quirk.Tests
         public void FuncDef()
         {
             new Parser("Code/Parser/FuncDef.qk", "FuncDef", out var module);
-            Assert.AreEqual(0, module.Statements.Count);
+            Assert.AreEqual(7, module.Statements.Count);
 
-            var overload = (AST.Overload)module.NameTable["a"];
-            var func = overload.Funcs[0];
-            Assert.AreEqual(0, func.Parameters.Count);
-            Assert.AreEqual(0, func.Statements.Count);
-            Assert.AreEqual(0, func.NameTable.Count);
+            var stmnt = (AST.FuncDef)module.Statements[0];
+            Assert.AreEqual("a", stmnt.Func.Name);
+            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
+            Assert.AreEqual(0, stmnt.Func.Statements.Count);
+            Assert.AreEqual(null, stmnt.Func.RetType);
 
-            overload = (AST.Overload)module.NameTable["b"];
-            func = overload.Funcs[0];
-            Assert.AreEqual(0, func.Parameters.Count);
-            Assert.AreEqual(0, func.Statements.Count);
-            Assert.AreEqual(1, func.NameTable.Count);
-            overload = (AST.Overload)func.NameTable["c"];       // inner function
-            func = overload.Funcs[0];
-            Assert.AreEqual(0, func.Parameters.Count);
-            Assert.AreEqual(0, func.Statements.Count);
-            Assert.AreEqual(0, func.NameTable.Count);
+            stmnt = (AST.FuncDef)module.Statements[1];
+            Assert.AreEqual("b", stmnt.Func.Name);
+            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
+            Assert.AreEqual(1, stmnt.Func.Statements.Count);
+            Assert.AreEqual(null, stmnt.Func.RetType);
 
-            overload = (AST.Overload)module.NameTable["c"];     // outer function
-            func = overload.Funcs[0];
-            Assert.AreEqual(1, func.Parameters.Count);
-            Assert.AreEqual(0, func.Statements.Count);
-            Assert.AreEqual(0, func.NameTable.Count);
-            var param = (AST.Variable)func.Parameters[0];
+            var inner = (AST.FuncDef)stmnt.Func.Statements[0];
+            Assert.AreEqual("c", inner.Func.Name);
+            Assert.AreEqual(0, inner.Func.Parameters.Count);
+            Assert.AreEqual(0, inner.Func.Statements.Count);
+            Assert.AreEqual(null, inner.Func.RetType);
+
+            stmnt = (AST.FuncDef)module.Statements[2];
+            Assert.AreEqual("c", stmnt.Func.Name);
+            Assert.AreEqual(1, stmnt.Func.Parameters.Count);
+            Assert.AreEqual(0, stmnt.Func.Statements.Count);
+            var param = (AST.Variable)stmnt.Func.Parameters[0];
             Assert.AreEqual("x", param.Name);
+            Assert.AreEqual(null, param.Type);
+            Assert.AreEqual(null, stmnt.Func.RetType);
 
-            overload = (AST.Overload)module.NameTable["d"];
-            func = overload.Funcs[0];
-            Assert.AreEqual(2, func.Parameters.Count);
-            Assert.AreEqual(0, func.Statements.Count);
-            Assert.AreEqual(0, func.NameTable.Count);
-            param = (AST.Variable)func.Parameters[0];
+            stmnt = (AST.FuncDef)module.Statements[3];
+            Assert.AreEqual("d", stmnt.Func.Name);
+            Assert.AreEqual(2, stmnt.Func.Parameters.Count);
+            Assert.AreEqual(0, stmnt.Func.Statements.Count);
+            param = (AST.Variable)stmnt.Func.Parameters[0];
             Assert.AreEqual("x", param.Name);
-            param = (AST.Variable)func.Parameters[1];
+            Assert.AreEqual(null, param.Type);
+            param = (AST.Variable)stmnt.Func.Parameters[1];
             Assert.AreEqual("y", param.Name);
+            Assert.AreEqual(null, param.Type);
+            Assert.AreEqual(null, stmnt.Func.RetType);
+
+            stmnt = (AST.FuncDef)module.Statements[4];
+            Assert.AreEqual("a", stmnt.Func.Name);
+            Assert.AreEqual(1, stmnt.Func.Parameters.Count);
+            Assert.AreEqual(0, stmnt.Func.Statements.Count);
+            param = (AST.Variable)stmnt.Func.Parameters[0];
+            Assert.AreEqual("x", param.Name);
+            Assert.AreEqual(null, param.Type);
+            Assert.AreEqual(null, stmnt.Func.RetType);
+
+            stmnt = (AST.FuncDef)module.Statements[5];
+            Assert.AreEqual("e", stmnt.Func.Name);
+            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
+            Assert.AreEqual(0, stmnt.Func.Statements.Count);
+            Assert.AreEqual("Int", ((AST.NameObj)stmnt.Func.RetType).Name);
+
+            stmnt = (AST.FuncDef)module.Statements[6];
+            Assert.AreEqual("f", stmnt.Func.Name);
+            Assert.AreEqual(1, stmnt.Func.Parameters.Count);
+            Assert.AreEqual(0, stmnt.Func.Statements.Count);
+            param = (AST.Variable)stmnt.Func.Parameters[0];
+            Assert.AreEqual("x", param.Name);
+            Assert.AreEqual("Int", ((AST.NameObj)param.Type).Name);
+            Assert.AreEqual(null, stmnt.Func.RetType);
         }
 
         [TestMethod()]
         public void Suite()
         {
             new Parser("Code/Parser/Suite.qk", "Suite", out var module);
-            Assert.AreEqual(0, module.Statements.Count);
+            Assert.AreEqual(2, module.Statements.Count);
 
-            var overload = (AST.Overload)module.NameTable["a"];
-            var func = overload.Funcs[0];
-            Assert.AreEqual(0, func.Parameters.Count);
-            Assert.AreEqual(0, func.Statements.Count);
-            Assert.AreEqual(0, func.NameTable.Count);
+            var stmnt = (AST.FuncDef)module.Statements[0];
+            Assert.AreEqual("a", stmnt.Func.Name);
+            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
+            Assert.AreEqual(0, stmnt.Func.Statements.Count);
 
-            overload = (AST.Overload)module.NameTable["b"];
-            func = overload.Funcs[0];
-            Assert.AreEqual(0, func.Parameters.Count);
-            Assert.AreEqual(2, func.Statements.Count);
-            Assert.AreEqual(0, func.NameTable.Count);
-            var expr = (AST.Assignment)func.Statements[0];
-            Assert.AreEqual("x", ((AST.NamedObj)expr.Left).Name);
+            stmnt = (AST.FuncDef)module.Statements[1];
+            Assert.AreEqual("b", stmnt.Func.Name);
+            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
+            Assert.AreEqual(2, stmnt.Func.Statements.Count);
+            var expr = (AST.Assignment)stmnt.Func.Statements[0];
+            Assert.AreEqual("x", ((AST.NameObj)expr.Left).Name);
             Assert.AreEqual(1, ((AST.ConstInt)expr.Right).Value);
-            expr = (AST.Assignment)func.Statements[1];
-            Assert.AreEqual("y", ((AST.NamedObj)expr.Left).Name);
+            expr = (AST.Assignment)stmnt.Func.Statements[1];
+            Assert.AreEqual("y", ((AST.NameObj)expr.Left).Name);
             Assert.AreEqual(2, ((AST.ConstInt)expr.Right).Value);
+        }
+
+        [TestMethod()]
+        public void Return()
+        {
+            new Parser("Code/Parser/Return.qk", "Return", out var module);
+            Assert.AreEqual(3, module.Statements.Count);
+
+            var ret1 = (AST.ReturnStmnt)module.Statements[0];
+            Assert.AreEqual(0, ret1.Values.Count);
+
+            var ret2 = (AST.ReturnStmnt)module.Statements[1];
+            Assert.AreEqual(1, ret2.Values.Count);
+            Assert.AreEqual(1f, ((AST.ConstFloat)ret2.Values[0]).Value);
+
+            var ret3 = (AST.ReturnStmnt)module.Statements[2];
+            Assert.AreEqual(3, ret3.Values.Count);
+            Assert.AreEqual(1, ((AST.ConstInt)ret3.Values[0]).Value);
+            Assert.AreEqual(2, ((AST.ConstInt)ret3.Values[1]).Value);
+            Assert.AreEqual(true, ((AST.ConstBool)ret3.Values[2]).Value);
         }
     }
 }

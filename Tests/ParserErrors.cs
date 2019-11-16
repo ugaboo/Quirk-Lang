@@ -38,6 +38,7 @@ namespace Quirk.Tests
         [TestMethod()] public void FuncDef2() { Test("FuncDef2"); }
         [TestMethod()] public void FuncDef3() { Test("FuncDef3"); }
         [TestMethod()] public void FuncDef4() { Test("FuncDef4"); }
+        [TestMethod()] public void FuncDef5() { Test("FuncDef5"); }
         [TestMethod()] public void Parameters() { Test("Parameters"); }
         [TestMethod()] public void TypedFormalParamDef() { Test("TypedFormalParamDef"); }
         [TestMethod()] public void Suite() { Test("Suite", ErrorType.ExpectedAnIndentedBlock); }

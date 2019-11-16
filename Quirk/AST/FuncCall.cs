@@ -19,7 +19,13 @@ namespace Quirk.AST
             Args.AddRange(args);
         }
 
-        public override void Accept(Visitor visitor)
+        public FuncCall(string name, params ProgObj[] args)
+        {
+            Func = new NameObj(name);
+            Args.AddRange(args);
+        }
+
+        public override void Accept(IVisitor visitor)
         {
             visitor.Visit(this);
         }

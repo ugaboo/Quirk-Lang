@@ -1,0 +1,9 @@
+﻿def f():
+	pass
+
+def f(x):
+	def f():
+		pass
+	f()
+
+f()

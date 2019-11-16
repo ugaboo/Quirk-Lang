@@ -10,3 +10,12 @@ def c(x):
 
 def d(x, y,):
 	pass
+
+def a(x):
+	pass
+
+def e() -> Int:
+	pass
+
+def f(x : Int):
+	pass

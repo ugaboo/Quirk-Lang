@@ -1,0 +1,16 @@
+﻿def f():
+	def g():
+		def h():
+			pass
+
+f()
+
+def f():
+	pass
+
+f()
+
+def h():
+	pass
+
+h()

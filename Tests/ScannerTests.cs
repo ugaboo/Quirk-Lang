@@ -22,6 +22,8 @@ namespace Quirk.Tests
             scan.Next();
             Assert.AreEqual(Semicolon, scan.Lexeme);
             scan.Next();
+            Assert.AreEqual(RightArrow, scan.Lexeme);
+            scan.Next();
             Assert.AreEqual(Plus, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(Minus, scan.Lexeme);
@@ -80,6 +82,8 @@ namespace Quirk.Tests
             Assert.AreEqual(KwOr, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(KwPass, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(KwReturn, scan.Lexeme);
             scan.Next();
             Assert.AreEqual(KwTrue, scan.Lexeme);
             scan.Next();

@@ -1,9 +1,13 @@
 ﻿namespace Quirk.AST
 {
-    public class Tuple : ProgObj
+    public class FuncDef : ProgObj
     {
-        public Tuple()
+        public Function Func;
+
+
+        public FuncDef(Function func)
         {
+            Func = func;
         }
 
         public override void Accept(IVisitor visitor)

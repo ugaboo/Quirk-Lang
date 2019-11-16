@@ -4,12 +4,13 @@
     {
         public readonly float Value;
 
+
         public ConstFloat(float value)
         {
             Value = value;
         }
 
-        public override void Accept(Visitor visitor)
+        public override void Accept(IVisitor visitor)
         {
             visitor.Visit(this);
         }

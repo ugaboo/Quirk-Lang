@@ -4,12 +4,13 @@
     {
         public readonly bool Value;
 
+
         public ConstBool(bool value)
         {
             Value = value;
         }
 
-        public override void Accept(Visitor visitor)
+        public override void Accept(IVisitor visitor)
         {
             visitor.Visit(this);
         }

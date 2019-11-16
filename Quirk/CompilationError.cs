@@ -11,6 +11,13 @@ namespace Quirk
         ExpectedAnIndentedBlock,
         InvalidSyntax,
         DuplicateParameter,
+        ObjectIsNotDefined,
+        AssignmentIsNotPossible,
+        CantDetermineType,
+        ObjectIsNotCallable,
+        NotAType,
+        ReturnOutsideFunction,
+        ObjectRequired,
     }
 
     public class CompilationError : Exception

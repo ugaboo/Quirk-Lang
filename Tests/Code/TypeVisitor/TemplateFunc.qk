@@ -1,0 +1,11 @@
+﻿a = 1
+def f(x):
+	a = 2
+	b = x
+	def g(y):
+		a = 3
+		b = y
+		c = y
+	g(x)
+f(0)
+f(0.0)

@@ -12,6 +12,7 @@ namespace Quirk
             { "or", Lexeme.KwOr},
             { "not", Lexeme.KwNot },
             { "pass", Lexeme.KwPass },
+            { "return", Lexeme.KwReturn },
             { "True", Lexeme.KwTrue },
             { "False", Lexeme.KwFalse },
         };
@@ -150,6 +151,7 @@ namespace Quirk
                         case '-':
                             reader.Next();
                             switch (reader.Value) {
+                                case '>': SetLexeme(Lexeme.RightArrow); break;
                                 default: Lexeme = Lexeme.Minus; break;
                             }
                             break;

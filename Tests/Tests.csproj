@@ -25,16 +25,46 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Code\FuncParamsProcessor\ParameterOverlap.qk">
+    <None Update="Code\NameVisitor\BuiltIns.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Code\FuncParamsProcessor\CopyParamsToNameTable.qk">
+    <None Update="Code\NameVisitor\Errors\ObjectIsNotDefined.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Code\FuncParamsProcessor\Errors\DuplicateParameter.qk">
+    <None Update="Code\NameVisitor\Return.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Code\NameFinder\Test.qk">
+    <None Update="Code\NameVisitor\FuncCall.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\NameVisitor\Evaluation.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\NameVisitor\Assignment.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\NameVisitor\Overload.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\NameVisitor\RetType.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\Parser\Errors\FuncDef5.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\Parser\Return.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\TODO\ParameterOverlap.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\NameVisitor\Params.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\NameVisitor\Errors\DuplicateParameter.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\NameVisitor\NestedFuncs.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Code\Parser\Errors\AtomParenthesis.qk">
@@ -223,6 +253,34 @@
     <None Update="Code\Scanner\Operators.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Code\CodeGenVisitor\Function.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\TypeVisitor\Errors\AssignmentIsNotPossible.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\TypeVisitor\Errors\CantDetermineType.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\TypeVisitor\OperatorOverloads.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\TypeVisitor\FuncCall.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\TypeVisitor\RetType.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\TypeVisitor\Constants.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\TypeVisitor\TemplateFunc.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Code\CodeGenVisitor\Errors\" />
   </ItemGroup>
 
 </Project>

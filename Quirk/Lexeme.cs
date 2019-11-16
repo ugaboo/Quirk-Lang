@@ -26,7 +26,7 @@
         Comma,                  // ,
         Minus,                  // -
         //SubAssign,              // -=
-        //RightArrow,             // ->
+        RightArrow,             // ->
         FullStop,               // .
         //Ellipsis,               // ...
         Slash,                  // /
@@ -89,7 +89,7 @@
         KwOr,
         KwPass,
         //KwRaise,
-        //KwReturn,
+        KwReturn,
         KwTrue,
         //KwTry,
         //KwType,

@@ -6,7 +6,8 @@ namespace Quirk
 {
     public class Parser
     {
-        private Scanner scan;
+        Scanner scan;
+
 
         public Parser(string filename, string name, out AST.Module module)
         {
@@ -21,7 +22,7 @@ namespace Quirk
             if (scan.Lexeme == Lexeme.EndMarker) {
                 goto _end;
             }
-            if (Stmnt(module.NameTable, module.Statements)) {
+            if (Stmnt(module.Statements)) {
                 goto _0;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -29,12 +30,12 @@ namespace Quirk
             return true;
         }
 
-        bool Stmnt(Dictionary<string, AST.ProgObj> nameTable, List<AST.ProgObj> statements)
+        bool Stmnt(List<AST.ProgObj> statements)
         {
             if (SimpleStmnt(statements)) {
                 goto _end;
             }
-            if (CompoundStmnt(nameTable, statements)) {
+            if (CompoundStmnt(statements)) {
                 goto _end;
             }
             return false;
@@ -79,6 +80,9 @@ namespace Quirk
                 goto _end;
             }
             if (PassStmnt()) {
+                goto _end;
+            }
+            if (FlowStmnt(statements)) {
                 goto _end;
             }
             return false;
@@ -172,7 +176,7 @@ namespace Quirk
             return false;
         _1:
             if (AndTest(out var right)) {
-                expr = new AST.BinaryExpression(AST.BinaryExpressionType.Or, expr, right);
+                expr = new AST.FuncCall("__or__", expr, right);
                 goto _2;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -194,7 +198,7 @@ namespace Quirk
             return false;
         _1:
             if (NotTest(out var right)) {
-                expr = new AST.BinaryExpression(AST.BinaryExpressionType.And, expr, right);
+                expr = new AST.FuncCall("__and__", expr, right);
                 goto _2;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -220,7 +224,7 @@ namespace Quirk
             return false;
         _1:
             if (NotTest(out var right)) {
-                expr = new AST.UnaryExpression(AST.UnaryExpressionType.Not, right);
+                expr = new AST.FuncCall("__not__", right);
                 goto _end;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -230,7 +234,7 @@ namespace Quirk
 
         bool Comparison(out AST.ProgObj expr)
         {
-            AST.BinaryExpressionType type;
+            string name;
             AST.ProgObj left;
             var chained = false;
 
@@ -241,10 +245,10 @@ namespace Quirk
             return false;
         _1:
             if (Expr(out var right)) {
-                var comp = new AST.BinaryExpression(type, left, right);
+                var comp = new AST.FuncCall(name, left, right);
                 left = right;
                 if (chained) {
-                    expr = new AST.BinaryExpression(AST.BinaryExpressionType.And, expr, comp);
+                    expr = new AST.FuncCall("__and__", expr, comp);
                 } else {
                     expr = comp;
                     chained = true;
@@ -253,7 +257,7 @@ namespace Quirk
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
-            if (CompOp(out type)) {
+            if (CompOp(out name)) {
                 goto _1;
             }
             goto _end;
@@ -261,39 +265,39 @@ namespace Quirk
             return true;
         }
 
-        bool CompOp(out AST.BinaryExpressionType type)
+        bool CompOp(out string name)
         {
             if (scan.Lexeme == Lexeme.Less) {
-                type = AST.BinaryExpressionType.Less;
+                name = "__lt__";
                 scan.Next();
                 goto _end;
             }
             if (scan.Lexeme == Lexeme.Greater) {
-                type = AST.BinaryExpressionType.Greater;
+                name = "__gt__";
                 scan.Next();
                 goto _end;
             }
             if (scan.Lexeme == Lexeme.Equal) {
-                type = AST.BinaryExpressionType.Equal;
+                name = "__eq__";
                 scan.Next();
                 goto _end;
             }
             if (scan.Lexeme == Lexeme.LessOrEqual) {
-                type = AST.BinaryExpressionType.LessOrEqual;
+                name = "__le__";
                 scan.Next();
                 goto _end;
             }
             if (scan.Lexeme == Lexeme.GreaterOrEqual) {
-                type = AST.BinaryExpressionType.GreaterOrEqual;
+                name = "__ge__";
                 scan.Next();
                 goto _end;
             }
             if (scan.Lexeme == Lexeme.NotEqual) {
-                type = AST.BinaryExpressionType.NotEqual;
+                name = "__ne__";
                 scan.Next();
                 goto _end;
             }
-            type = AST.BinaryExpressionType.None;
+            name = null;
             return false;
         _end:
             return true;
@@ -307,7 +311,7 @@ namespace Quirk
             return false;
         _1:
             if (XorExpr(out var right)) {
-                expr = new AST.BinaryExpression(AST.BinaryExpressionType.BitOr, expr, right);
+                expr = new AST.FuncCall("__bitor__", expr, right);
                 goto _2;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -329,7 +333,7 @@ namespace Quirk
             return false;
         _1:
             if (AndExpr(out var right)) {
-                expr = new AST.BinaryExpression(AST.BinaryExpressionType.BitXor, expr, right);
+                expr = new AST.FuncCall("__bitxor__", expr, right);
                 goto _2;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -351,7 +355,7 @@ namespace Quirk
             return false;
         _1:
             if (ShiftExpr(out var right)) {
-                expr = new AST.BinaryExpression(AST.BinaryExpressionType.BitAnd, expr, right);
+                expr = new AST.FuncCall("__bitand__", expr, right);
                 goto _2;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -367,7 +371,7 @@ namespace Quirk
 
         bool ShiftExpr(out AST.ProgObj expr)
         {
-            AST.BinaryExpressionType type;
+            string name;
 
             if (ArithExpr(out expr)) {
                 goto _2;
@@ -375,18 +379,18 @@ namespace Quirk
             return false;
         _1:
             if (ArithExpr(out var right)) {
-                expr = new AST.BinaryExpression(type, expr, right);
+                expr = new AST.FuncCall(name, expr, right);
                 goto _2;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.LeftShift) {
-                type = AST.BinaryExpressionType.LeftShift;
+                name = "__lshift__";
                 scan.Next();
                 goto _1;
             }
             if (scan.Lexeme == Lexeme.RightShift) {
-                type = AST.BinaryExpressionType.RightShift;
+                name = "__rshift__";
                 scan.Next();
                 goto _1;
             }
@@ -397,7 +401,7 @@ namespace Quirk
 
         bool ArithExpr(out AST.ProgObj expr)
         {
-            AST.BinaryExpressionType type;
+            string name;
 
             if (Term(out expr)) {
                 goto _2;
@@ -405,18 +409,18 @@ namespace Quirk
             return false;
         _1:
             if (Term(out var right)) {
-                expr = new AST.BinaryExpression(type, expr, right);
+                expr = new AST.FuncCall(name, expr, right);
                 goto _2;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.Plus) {
-                type = AST.BinaryExpressionType.Add;
+                name = "__add__";
                 scan.Next();
                 goto _1;
             }
             if (scan.Lexeme == Lexeme.Minus) {
-                type = AST.BinaryExpressionType.Sub;
+                name = "__sub__";
                 scan.Next();
                 goto _1;
             }
@@ -427,7 +431,7 @@ namespace Quirk
 
         bool Term(out AST.ProgObj expr)
         {
-            AST.BinaryExpressionType type;
+            string name;
 
             if (Factor(out expr)) {
                 goto _2;
@@ -436,28 +440,28 @@ namespace Quirk
             return false;
         _1:
             if (Factor(out var right)) {
-                expr = new AST.BinaryExpression(type, expr, right);
+                expr = new AST.FuncCall(name, expr, right);
                 goto _2;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _2:
             if (scan.Lexeme == Lexeme.Star) {
-                type = AST.BinaryExpressionType.Mul;
+                name = "__mul__";
                 scan.Next();
                 goto _1;
             }
             if (scan.Lexeme == Lexeme.Slash) {
-                type = AST.BinaryExpressionType.Div;
+                name = "__truediv__";
                 scan.Next();
                 goto _1;
             }
             if (scan.Lexeme == Lexeme.Percent) {
-                type = AST.BinaryExpressionType.Mod;
+                name = "__mod__";
                 scan.Next();
                 goto _1;
             }
             if (scan.Lexeme == Lexeme.DoubleSlash) {
-                type = AST.BinaryExpressionType.FloorDiv;
+                name = "__floordiv__";
                 scan.Next();
                 goto _1;
             }
@@ -468,23 +472,23 @@ namespace Quirk
 
         bool Factor(out AST.ProgObj expr)
         {
-            AST.UnaryExpressionType type;
+            string name;
 
             if (Power(out expr)) {
                 goto _end;
             }
             if (scan.Lexeme == Lexeme.Plus) {
-                type = AST.UnaryExpressionType.Plus;
+                name = "__pos__";
                 scan.Next();
                 goto _1;
             }
             if (scan.Lexeme == Lexeme.Minus) {
-                type = AST.UnaryExpressionType.Minus;
+                name = "__neg__";
                 scan.Next();
                 goto _1;
             }
             if (scan.Lexeme == Lexeme.BitNot) {
-                type = AST.UnaryExpressionType.BitNot;
+                name = "__invert__";
                 scan.Next();
                 goto _1;
             }
@@ -492,7 +496,7 @@ namespace Quirk
             return false;
         _1:
             if (Factor(out var right)) {
-                expr = new AST.UnaryExpression(type, right);
+                expr = new AST.FuncCall(name, right);
                 goto _end;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -515,7 +519,7 @@ namespace Quirk
             goto _end;
         _2:
             if (Factor(out var right)) {
-                expr = new AST.BinaryExpression(AST.BinaryExpressionType.Power, expr, right);
+                expr = new AST.FuncCall("__pow__", expr, right);
                 goto _end;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -553,7 +557,7 @@ namespace Quirk
                 goto _1;
             }
             if (scan.Lexeme == Lexeme.Id) {
-                obj = new AST.NamedObj(scan.TextValue());
+                obj = new AST.NameObj(scan.TextValue());
                 scan.Next();
                 goto _end;
             }
@@ -694,9 +698,9 @@ namespace Quirk
             return true;
         }
 
-        bool CompoundStmnt(Dictionary<string, AST.ProgObj> nameTable, List<AST.ProgObj> statements)
+        bool CompoundStmnt(List<AST.ProgObj> statements)
         {
-            if (FuncDef(nameTable)) {
+            if (FuncDef(statements)) {
                 goto _end;
             }
             return false;
@@ -704,7 +708,7 @@ namespace Quirk
             return true;
         }
 
-        bool Suite(Dictionary<string, AST.ProgObj> nameTable, List<AST.ProgObj> statements)
+        bool Suite(List<AST.ProgObj> statements)
         {
             if (SimpleStmnt(statements)) {
                 goto _end;
@@ -721,12 +725,12 @@ namespace Quirk
             }
             throw new CompilationError(ErrorType.ExpectedAnIndentedBlock);
         _2:
-            if (Stmnt(nameTable, statements)) {
+            if (Stmnt(statements)) {
                 goto _3;
             }
-            throw new CompilationError(ErrorType.InvalidSyntax);        // unreachable
+            throw new InvalidOperationException();
         _3:
-            if (Stmnt(nameTable, statements)) {
+            if (Stmnt(statements)) {
                 goto _3;
             }
             if (scan.Lexeme == Lexeme.Dedent) {
@@ -737,15 +741,15 @@ namespace Quirk
                 scan.Next();
                 goto _end;
             }
-            throw new CompilationError(ErrorType.InvalidSyntax);        // unreachable
+            throw new InvalidOperationException();
         _end:
             return true;
         }
 
-        bool FuncDef(Dictionary<string, AST.ProgObj> nameTable)
+        bool FuncDef(List<AST.ProgObj> statements)
         {
             string name;
-            AST.Func func;
+            AST.Function func;
 
             if (scan.Lexeme == Lexeme.KwDef) {
                 scan.Next();
@@ -755,7 +759,7 @@ namespace Quirk
         _1:
             if (scan.Lexeme == Lexeme.Id) {
                 name = scan.TextValue();
-                func = new AST.Func(name);
+                func = new AST.Function(name);
 
                 scan.Next();
                 goto _2;
@@ -767,7 +771,16 @@ namespace Quirk
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _3:
+            if (scan.Lexeme == Lexeme.RightArrow) {
+                scan.Next();
+                goto _4;
+            }
             goto _5;
+        _4:
+            if (Test(out func.RetType)) {
+                goto _5;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
         _5:
             if (scan.Lexeme == Lexeme.Colon) {
                 scan.Next();
@@ -775,20 +788,16 @@ namespace Quirk
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _6:
-            if (Suite(func.NameTable, func.Statements)) {
+            if (Suite(func.Statements)) {
                 goto _end;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
-            if (nameTable.TryGetValue(name, out var obj)) {
-                ((AST.Overload)obj).Funcs.Add(func);
-            } else {
-                nameTable[name] = new AST.Overload(func);
-            }
+            statements.Add(new AST.FuncDef(func));
             return true;
         }
 
-        bool Parameters(List<AST.ProgObj> parameters)
+        bool Parameters(List<AST.Variable> parameters)
         {
             if (scan.Lexeme == Lexeme.LeftParenthesis) {
                 scan.Next();
@@ -810,7 +819,7 @@ namespace Quirk
             return true;
         }
 
-        bool TypedArgsList(List<AST.ProgObj> parameters)
+        bool TypedArgsList(List<AST.Variable> parameters)
         {
             if (Arg(out var argument)) {
                 parameters.Add(argument);
@@ -858,16 +867,69 @@ namespace Quirk
             param = null;
             return false;
         _1:
-            //if (scan.Lexeme == Lexeme.Colon) {
-            //    scan.Next();
-            //    goto _2;
-            //}
+            if (scan.Lexeme == Lexeme.Colon) {
+                scan.Next();
+                goto _2;
+            }
             goto _end;
-        //_2:
-        //    if (Test(out var expr)) {
-        //        goto _end;
-        //    }
-        //    throw new CompilationError(ErrorType.InvalidSyntax);
+        _2:
+            if (Test(out param.Type)) {
+                goto _end;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
+        _end:
+            return true;
+        }
+
+        bool FlowStmnt(List<AST.ProgObj> statements)
+        {
+            if (ReturnStmnt(out var stmnt)) {
+                statements.Add(stmnt);
+                goto _end;
+            }
+            return false;
+        _end:
+            return true;
+        }
+
+        bool ReturnStmnt(out AST.ReturnStmnt stmnt)
+        {
+            if (scan.Lexeme == Lexeme.KwReturn) {
+                stmnt = new AST.ReturnStmnt();
+
+                scan.Next();
+                goto _1;
+            }
+            stmnt = null;
+            return false;
+        _1:
+            if (TestList(stmnt.Values)) {
+                goto _end;
+            }
+            goto _end;
+        _end:
+            return true;
+        }
+
+        bool TestList(List<AST.ProgObj> expressions)
+        {
+            if (Test(out var expr)) {
+                expressions.Add(expr);
+                goto _1;
+            }
+            return false;
+        _1:
+            if (scan.Lexeme == Lexeme.Comma) {
+                scan.Next();
+                goto _2;
+            }
+            goto _end;
+        _2:
+            if (Test(out expr)) {
+                expressions.Add(expr);
+                goto _1;
+            }
+            goto _end;
         _end:
             return true;
         }
