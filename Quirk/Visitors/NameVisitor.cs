@@ -167,7 +167,7 @@ namespace Quirk.Visitors
                 var func = new Function(name);
                 func.RetType = retType;
                 for (var i = 0; i < paramTypes.Length; i += 1) {
-                    var v = new Variable(('a' + i).ToString());
+                    var v = new Variable( ( (char)('a' + i) ).ToString() );
                     v.Type = paramTypes[i];
                     func.Parameters.Add(v);
                 }

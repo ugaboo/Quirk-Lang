@@ -12,6 +12,7 @@ namespace Quirk.Visitors
         Stack<LLVMBasicBlockRef> blocks = new Stack<LLVMBasicBlockRef>();
 
         Dictionary<AST.Function, LLVMValueRef> llvmFuncs = new Dictionary<AST.Function, LLVMValueRef>();
+        Dictionary<AST.Variable, LLVMValueRef> llvmVars = new Dictionary<AST.Variable, LLVMValueRef>();
 
         readonly Stack<AST.Function> hierarchy = new Stack<AST.Function>();
 
@@ -49,7 +50,7 @@ namespace Quirk.Visitors
 
         public void Visit(AST.Function func)
         {
-            if (GenerateIntrinsic(func)) { return; }
+            if (Intrinsic(func)) { return; }
 
             hierarchy.Push(func);
 
@@ -85,6 +86,9 @@ namespace Quirk.Visitors
 
         public void Visit(AST.Variable variable)
         {
+            LLVM.PositionBuilderAtEnd(builder, blocks.Peek());
+            values.Push(LLVM.BuildLoad(builder, llvmVars[variable], ""));
+
             //var variableLLVM = LLVM.AddGlobal(moduleLLVM, LLVM.Int32Type(), variable.Name);
             //LLVM.SetLinkage(variableLLVM, LLVMLinkage.LLVMCommonLinkage);
             //LLVM.SetInitializer(variableLLVM, LLVM.ConstInt(LLVM.Int32Type(), 0, false));
@@ -102,8 +106,19 @@ namespace Quirk.Visitors
 
         public void Visit(AST.Assignment assignment)
         {
-            assignment.Left.Accept(this);
-            var left = values.Pop();
+            LLVMValueRef left;
+            if (assignment.Left is AST.Variable variable) {
+                if (llvmVars.TryGetValue(variable, out var variableLLVM) == false) {
+                    variable.Type.Accept(this);
+                    var typeLLVM = types.Pop();
+                    LLVM.PositionBuilderAtEnd(builder, blocks.Peek());
+                    variableLLVM = LLVM.BuildAlloca(builder, typeLLVM, variable.Name);
+                    llvmVars[variable] = variableLLVM;
+                }
+                left = variableLLVM;
+            } else {
+                throw new InvalidOperationException();
+            }
 
             assignment.Right.Accept(this);
             var right = values.Pop();
@@ -129,7 +144,7 @@ namespace Quirk.Visitors
             }
 
             LLVM.PositionBuilderAtEnd(builder, blocks.Peek());
-            var funcCallLLVM = LLVM.BuildCall(builder, funcLLVM, args, "c");
+            var funcCallLLVM = LLVM.BuildCall(builder, funcLLVM, args, "");
             values.Push(funcCallLLVM);
 
 
@@ -195,18 +210,36 @@ namespace Quirk.Visitors
             return name;
         }
 
-        bool GenerateIntrinsic(AST.Function func)
+        bool Intrinsic(AST.Function func)
         {
-            //switch (intrinsic.Name) {
+            switch (func.Name) {
+                case "__add__":
+                    if (llvmFuncs.TryGetValue(func, out var llvm) == false) {
+                        llvm = LLVM.AddFunction(moduleLLVM, func.Name, LLVM.FunctionType(LLVM.Int32Type(), new LLVMTypeRef[] { LLVM.Int32Type(), LLVM.Int32Type() }, false));
+                        //var context = LLVM.ContextCreate();
+                        var context = LLVM.GetGlobalContext();
+                        var K = "alwaysinline";
+                        var attr = LLVM.CreateStringAttribute(context, K, (uint)K.Length, "", 0);
+                        LLVM.AddAttributeAtIndex(llvm, LLVMAttributeIndex.LLVMAttributeFunctionIndex, attr);
+                        LLVM.SetValueName(LLVM.GetParam(llvm, 0), "a");
+                        LLVM.SetValueName(LLVM.GetParam(llvm, 1), "b");
+                        llvmFuncs[func] = llvm;
+                        var block = LLVM.AppendBasicBlock(llvm, "entry");
+                        LLVM.PositionBuilderAtEnd(builder, block);
+                        var add = LLVM.BuildAdd(builder, LLVM.GetParam(llvm, 0), LLVM.GetParam(llvm, 1), "");
+                        LLVM.BuildRet(builder, add);
+                    }
+                    values.Push(llvm);
+                    break;
             //    case "print":
             //        dstr = LLVM.BuildGlobalStringPtr(builder, "%d\n", "d");
             //        var printf = LLVM.AddFunction(moduleLLVM, "printf", LLVM.FunctionType(LLVM.Int32Type(), new LLVMTypeRef[] { LLVM.PointerType(LLVM.Int8Type(), 0) }, true));
             //        LLVM.SetLinkage(printf, LLVMLinkage.LLVMExternalLinkage);
             //        values[intrinsic] = printf;
             //        break;
-            //    default:
-            //        throw new Exception("Not implemented");
-            //}
+                default:
+                    throw new Exception("Not implemented");
+            }
 
             return false;
         }
