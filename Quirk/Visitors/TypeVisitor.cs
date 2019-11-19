@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Quirk.AST;
 using static Quirk.ErrorType;
+using Quirk.Helpers;
 
 namespace Quirk.Visitors
 {
@@ -49,6 +50,11 @@ namespace Quirk.Visitors
         public void Visit(Variable variable)
         {
             result.Push((TypeObj)variable.Type);
+        }
+
+        public void Visit(Parameter parameter)
+        {
+            result.Push((TypeObj)parameter.Type);
         }
 
         public void Visit(AST.Tuple tuple) { throw new Exception("Not implemented"); }
@@ -139,17 +145,17 @@ namespace Quirk.Visitors
 
         public void Visit(ConstInt constInt)
         {
-            result.Push(TypeObj.Int);
+            result.Push(BuiltIns.Int);
         }
 
         public void Visit(ConstFloat constFloat)
         {
-            result.Push(TypeObj.Float);
+            result.Push(BuiltIns.Float);
         }
 
         public void Visit(ConstBool constBool)
         {
-            result.Push(TypeObj.Bool);
+            result.Push(BuiltIns.Bool);
         }
 
         public void Visit(TypeObj typeObj) { throw new InvalidOperationException(); }

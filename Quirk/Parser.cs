@@ -797,7 +797,7 @@ namespace Quirk
             return true;
         }
 
-        bool Parameters(List<AST.Variable> parameters)
+        bool Parameters(List<AST.Parameter> parameters)
         {
             if (scan.Lexeme == Lexeme.LeftParenthesis) {
                 scan.Next();
@@ -819,7 +819,7 @@ namespace Quirk
             return true;
         }
 
-        bool TypedArgsList(List<AST.Variable> parameters)
+        bool TypedArgsList(List<AST.Parameter> parameters)
         {
             if (Arg(out var argument)) {
                 parameters.Add(argument);
@@ -844,7 +844,7 @@ namespace Quirk
             return true;
         }
 
-        bool Arg(out AST.Variable argument)
+        bool Arg(out AST.Parameter argument)
         {
             if (TypedFormalParamDef(out argument)) {
                 goto _1;
@@ -856,10 +856,10 @@ namespace Quirk
             return true;
         }
 
-        bool TypedFormalParamDef(out AST.Variable param)
+        bool TypedFormalParamDef(out AST.Parameter param)
         {
             if (scan.Lexeme == Lexeme.Id) {
-                param = new AST.Variable(scan.TextValue());
+                param = new AST.Parameter(scan.TextValue());
 
                 scan.Next();
                 goto _1;

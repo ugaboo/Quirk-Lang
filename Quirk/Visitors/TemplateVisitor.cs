@@ -45,9 +45,9 @@ namespace Quirk.Visitors
 
             foreach (var param in func.Parameters) {
                 param.Accept(this);
-                var v = (Variable)result.Pop();
-                clone.Parameters.Add(v);
-                clones[param] = v;
+                var p = (Parameter)result.Pop();
+                clone.Parameters.Add(p);
+                clones[param] = p;
             }
 
             foreach (var stmnt in func.Statements) {
@@ -72,6 +72,17 @@ namespace Quirk.Visitors
                     // global variable / closure
                     result.Push(variable);
                 }
+            }
+        }
+
+        public void Visit(Parameter parameter)
+        {
+            if (clones.TryGetValue(parameter, out var clone) == true) {
+                result.Push(clone);
+            } else {
+                var p = new Parameter(parameter);
+                result.Push(p);
+                clones[parameter] = p;
             }
         }
 

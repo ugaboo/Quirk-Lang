@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Quirk.AST;
 
-namespace Quirk.Visitors
+namespace Quirk.Helpers
 {
     public class SpecFuncs
     {

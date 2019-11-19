@@ -1,6 +1,7 @@
 ﻿using LLVMSharp;
 using System;
 using System.Collections.Generic;
+using Quirk.Helpers;
 
 namespace Quirk.Visitors
 {
@@ -13,11 +14,14 @@ namespace Quirk.Visitors
 
         Dictionary<AST.Function, LLVMValueRef> llvmFuncs = new Dictionary<AST.Function, LLVMValueRef>();
         Dictionary<AST.Variable, LLVMValueRef> llvmVars = new Dictionary<AST.Variable, LLVMValueRef>();
+        Dictionary<AST.Parameter, LLVMValueRef> llvmParams = new Dictionary<AST.Parameter, LLVMValueRef>();
 
         readonly Stack<AST.Function> hierarchy = new Stack<AST.Function>();
 
         LLVMModuleRef moduleLLVM;
         LLVMValueRef dstr;
+
+        BuiltInsLLVM builtIns;
                
 
         public CodeGenVisitor(AST.Module module)
@@ -29,6 +33,8 @@ namespace Quirk.Visitors
         public void Visit(AST.Module module)
         {
             moduleLLVM = LLVM.ModuleCreateWithName(module.Name);
+
+            builtIns = new BuiltInsLLVM(builder, moduleLLVM);
 
             var mainFunc = LLVM.AddFunction(moduleLLVM, "main", LLVM.FunctionType(LLVM.Int32Type(), new LLVMTypeRef[] { }, false));
 
@@ -50,7 +56,7 @@ namespace Quirk.Visitors
 
         public void Visit(AST.Function func)
         {
-            if (Intrinsic(func)) { return; }
+            if (func.BuiltIn) { values.Push(builtIns.Find(func)); return; }
 
             hierarchy.Push(func);
 
@@ -58,16 +64,13 @@ namespace Quirk.Visitors
                 values.Push(funcLLVM);
             } else {
                 var name = DetermineName(func);
-                var paramTypes = new LLVMTypeRef[func.Parameters.Count];
-                for (var i = 0; i < func.Parameters.Count; i += 1) {
-                    func.Parameters[i].Type.Accept(this);
-                    paramTypes[i] = types.Pop();
-                }
+                var paramTypes = GetTypes(func.Parameters);
                 llvmFuncs[func] = funcLLVM = LLVM.AddFunction(moduleLLVM, name, LLVM.FunctionType(LLVM.VoidType(), paramTypes, false));
                 LLVM.SetLinkage(funcLLVM, LLVMLinkage.LLVMExternalLinkage);
 
                 for (var i = 0; i < func.Parameters.Count; i += 1) {
                     var param = LLVM.GetParam(funcLLVM, (uint)i);
+                    llvmParams[func.Parameters[i]] = param;
                     LLVM.SetValueName(param, func.Parameters[i].Name);
                 }
 
@@ -93,6 +96,11 @@ namespace Quirk.Visitors
             //LLVM.SetLinkage(variableLLVM, LLVMLinkage.LLVMCommonLinkage);
             //LLVM.SetInitializer(variableLLVM, LLVM.ConstInt(LLVM.Int32Type(), 0, false));
             //values[variable] = variableLLVM;
+        }
+
+        public void Visit(AST.Parameter parameter)
+        {
+            values.Push(llvmParams[parameter]);
         }
 
         public void Visit(AST.Tuple tuple) { throw new Exception("Not implemented"); }
@@ -185,17 +193,8 @@ namespace Quirk.Visitors
 
         public void Visit(AST.TypeObj typeObj)
         {
-            if (typeObj == AST.TypeObj.Int) {
-                types.Push(LLVM.Int32Type());
-            } else if (typeObj == AST.TypeObj.Float) {
-                types.Push(LLVM.Int32Type());
-            } else if (typeObj == AST.TypeObj.Bool) {
-                types.Push(LLVM.Int8Type());
-            } else {
-                throw new Exception("Not implemented");
-            }
+            types.Push(typeObj.ToLLVM());
         }
-
 
         string DetermineName(AST.ProgObj obj)
         {
@@ -210,38 +209,14 @@ namespace Quirk.Visitors
             return name;
         }
 
-        bool Intrinsic(AST.Function func)
+        LLVMTypeRef[] GetTypes(List<AST.Parameter> parameters)
         {
-            switch (func.Name) {
-                case "__add__":
-                    if (llvmFuncs.TryGetValue(func, out var llvm) == false) {
-                        llvm = LLVM.AddFunction(moduleLLVM, func.Name, LLVM.FunctionType(LLVM.Int32Type(), new LLVMTypeRef[] { LLVM.Int32Type(), LLVM.Int32Type() }, false));
-                        //var context = LLVM.ContextCreate();
-                        var context = LLVM.GetGlobalContext();
-                        var K = "alwaysinline";
-                        var attr = LLVM.CreateStringAttribute(context, K, (uint)K.Length, "", 0);
-                        LLVM.AddAttributeAtIndex(llvm, LLVMAttributeIndex.LLVMAttributeFunctionIndex, attr);
-                        LLVM.SetValueName(LLVM.GetParam(llvm, 0), "a");
-                        LLVM.SetValueName(LLVM.GetParam(llvm, 1), "b");
-                        llvmFuncs[func] = llvm;
-                        var block = LLVM.AppendBasicBlock(llvm, "entry");
-                        LLVM.PositionBuilderAtEnd(builder, block);
-                        var add = LLVM.BuildAdd(builder, LLVM.GetParam(llvm, 0), LLVM.GetParam(llvm, 1), "");
-                        LLVM.BuildRet(builder, add);
-                    }
-                    values.Push(llvm);
-                    break;
-            //    case "print":
-            //        dstr = LLVM.BuildGlobalStringPtr(builder, "%d\n", "d");
-            //        var printf = LLVM.AddFunction(moduleLLVM, "printf", LLVM.FunctionType(LLVM.Int32Type(), new LLVMTypeRef[] { LLVM.PointerType(LLVM.Int8Type(), 0) }, true));
-            //        LLVM.SetLinkage(printf, LLVMLinkage.LLVMExternalLinkage);
-            //        values[intrinsic] = printf;
-            //        break;
-                default:
-                    throw new Exception("Not implemented");
+            var result = new LLVMTypeRef[parameters.Count];
+            for (var i = 0; i < parameters.Count; i += 1) {
+                parameters[i].Type.Accept(this);
+                result[i] = types.Pop();
             }
-
-            return false;
+            return result;
         }
     }
 }

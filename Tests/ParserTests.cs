@@ -451,7 +451,7 @@ namespace Quirk.Tests
             Assert.AreEqual("c", stmnt.Func.Name);
             Assert.AreEqual(1, stmnt.Func.Parameters.Count);
             Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            var param = (AST.Variable)stmnt.Func.Parameters[0];
+            var param = stmnt.Func.Parameters[0];
             Assert.AreEqual("x", param.Name);
             Assert.AreEqual(null, param.Type);
             Assert.AreEqual(null, stmnt.Func.RetType);
@@ -460,10 +460,10 @@ namespace Quirk.Tests
             Assert.AreEqual("d", stmnt.Func.Name);
             Assert.AreEqual(2, stmnt.Func.Parameters.Count);
             Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            param = (AST.Variable)stmnt.Func.Parameters[0];
+            param = stmnt.Func.Parameters[0];
             Assert.AreEqual("x", param.Name);
             Assert.AreEqual(null, param.Type);
-            param = (AST.Variable)stmnt.Func.Parameters[1];
+            param = stmnt.Func.Parameters[1];
             Assert.AreEqual("y", param.Name);
             Assert.AreEqual(null, param.Type);
             Assert.AreEqual(null, stmnt.Func.RetType);
@@ -472,7 +472,7 @@ namespace Quirk.Tests
             Assert.AreEqual("a", stmnt.Func.Name);
             Assert.AreEqual(1, stmnt.Func.Parameters.Count);
             Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            param = (AST.Variable)stmnt.Func.Parameters[0];
+            param = stmnt.Func.Parameters[0];
             Assert.AreEqual("x", param.Name);
             Assert.AreEqual(null, param.Type);
             Assert.AreEqual(null, stmnt.Func.RetType);
@@ -487,7 +487,7 @@ namespace Quirk.Tests
             Assert.AreEqual("f", stmnt.Func.Name);
             Assert.AreEqual(1, stmnt.Func.Parameters.Count);
             Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            param = (AST.Variable)stmnt.Func.Parameters[0];
+            param = stmnt.Func.Parameters[0];
             Assert.AreEqual("x", param.Name);
             Assert.AreEqual("Int", ((AST.NameObj)param.Type).Name);
             Assert.AreEqual(null, stmnt.Func.RetType);

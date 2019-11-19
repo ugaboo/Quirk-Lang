@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Quirk.Helpers;
 
 namespace Quirk.Tests
 {
@@ -29,7 +30,7 @@ namespace Quirk.Tests
             new Visitors.NameVisitor(module);
 
             var def = (AST.FuncDef)module.Statements[0];
-            Assert.AreEqual(AST.TypeObj.Int, def.Func.RetType);
+            Assert.AreEqual(Helpers.BuiltIns.Int, def.Func.RetType);
         }
 
         [TestMethod()]

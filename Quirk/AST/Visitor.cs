@@ -6,6 +6,7 @@
         void Visit(Overload overload);
         void Visit(Function func);
         void Visit(Variable variable);
+        void Visit(Parameter parameter);
         void Visit(Tuple tuple);
         void Visit(FuncDef funcDef);
         void Visit(Assignment assignment);

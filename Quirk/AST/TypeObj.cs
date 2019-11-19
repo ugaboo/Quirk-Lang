@@ -2,10 +2,6 @@
 {
     public class TypeObj : ProgObj
     {
-        public static readonly TypeObj Int = new TypeObj("Int");
-        public static readonly TypeObj Float = new TypeObj("Float");
-        public static readonly TypeObj Bool = new TypeObj("Bool");
-
         public string Name;
 
 

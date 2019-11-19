@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Quirk.AST;
+using Quirk.Helpers;
 using NameTable = System.Collections.Generic.Dictionary<string, Quirk.AST.ProgObj>;
 
 namespace Quirk.Visitors
@@ -39,7 +40,7 @@ namespace Quirk.Visitors
         {
             var moduleTable = new NameTable();
 
-            CreateBuiltIns(module, moduleTable);
+            AddBuiltIns(moduleTable);
 
             nameTables.Push(moduleTable);
             foreach (var statement in module.Statements) {
@@ -78,6 +79,13 @@ namespace Quirk.Visitors
         {
             if (variable.Type != null) {
                 Replace(ref variable.Type);
+            }
+        }
+
+        public void Visit(Parameter parameter)
+        {
+            if (parameter.Type != null) {
+                Replace(ref parameter.Type);
             }
         }
 
@@ -154,36 +162,22 @@ namespace Quirk.Visitors
         public void Visit(TypeObj typeObj) { throw new InvalidOperationException(); }
 
 
-        void CreateBuiltIns(Module module, NameTable table)
+        void AddBuiltIns(NameTable table)
         {
-            void CreateOverload(string name, ProgObj retType, params ProgObj[] paramTypes)
-            {
-                Overload overload;
-                if (table.TryGetValue(name, out var obj)) {
-                    overload = (Overload)obj;
-                } else {
-                    table[name] = overload = new Overload(name);
-                }
-                var func = new Function(name);
-                func.RetType = retType;
-                for (var i = 0; i < paramTypes.Length; i += 1) {
-                    var v = new Variable( ( (char)('a' + i) ).ToString() );
-                    v.Type = paramTypes[i];
-                    func.Parameters.Add(v);
-                }
-                overload.Funcs.Add(func);
-            }
+            table["Int"] = BuiltIns.Int;
+            table["Float"] = BuiltIns.Float;
+            table["Bool"] = BuiltIns.Bool;
 
-            table["Int"] = TypeObj.Int;
-            table["Float"] = TypeObj.Float;
-            table["Bool"] = TypeObj.Bool;
+            var print = new Overload("print");
+            print.Funcs.Add(new Function(null, "print", BuiltIns.Int));
+            table["print"] = print;
 
-            CreateOverload("print", null, TypeObj.Int);
-
-            CreateOverload("__add__", TypeObj.Int, TypeObj.Int, TypeObj.Int);
-            CreateOverload("__add__", TypeObj.Float, TypeObj.Float, TypeObj.Float);
-            CreateOverload("__add__", TypeObj.Float, TypeObj.Int, TypeObj.Float);
-            CreateOverload("__add__", TypeObj.Float, TypeObj.Float, TypeObj.Int);
+            var add = new Overload("__add__");
+            add.Funcs.Add(BuiltIns.Add_Int_Int);
+            add.Funcs.Add(BuiltIns.Add_Float_Int);
+            add.Funcs.Add(BuiltIns.Add_Int_Float);
+            add.Funcs.Add(BuiltIns.Add_Float_Float);
+            table["__add__"] = add;
         }
     }
 }

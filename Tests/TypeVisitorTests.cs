@@ -1,4 +1,5 @@
 ﻿using Quirk.AST;
+using Quirk.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Quirk.Tests
@@ -13,13 +14,13 @@ namespace Quirk.Tests
             new Visitors.TypeVisitor(module);
 
             var assignment = (Assignment)module.Statements[0];
-            Assert.AreEqual(TypeObj.Int, ((Variable)assignment.Left).Type);
+            Assert.AreEqual(BuiltIns.Int, ((Variable)assignment.Left).Type);
 
             assignment = (Assignment)module.Statements[1];
-            Assert.AreEqual(TypeObj.Float, ((Variable)assignment.Left).Type);
+            Assert.AreEqual(BuiltIns.Float, ((Variable)assignment.Left).Type);
 
             assignment = (Assignment)module.Statements[2];
-            Assert.AreEqual(TypeObj.Bool, ((Variable)assignment.Left).Type);
+            Assert.AreEqual(BuiltIns.Bool, ((Variable)assignment.Left).Type);
         }
 
         [TestMethod()]
@@ -29,7 +30,7 @@ namespace Quirk.Tests
             new Visitors.TypeVisitor(module);
 
             var def = (FuncDef)module.Statements[0];
-            Assert.AreEqual(TypeObj.Int, def.Func.RetType);
+            Assert.AreEqual(BuiltIns.Int, def.Func.RetType);
         }
 
         [TestMethod()]
@@ -39,13 +40,13 @@ namespace Quirk.Tests
             new Visitors.TypeVisitor(module);
 
             var assignment = (Assignment)module.Statements[0];
-            Assert.AreEqual(TypeObj.Int, ((Variable)assignment.Left).Type);
+            Assert.AreEqual(BuiltIns.Int, ((Variable)assignment.Left).Type);
 
             assignment = (Assignment)module.Statements[1];
-            Assert.AreEqual(TypeObj.Float, ((Variable)assignment.Left).Type);
+            Assert.AreEqual(BuiltIns.Float, ((Variable)assignment.Left).Type);
 
             assignment = (Assignment)module.Statements[2];
-            Assert.AreEqual(TypeObj.Float, ((Variable)assignment.Left).Type);
+            Assert.AreEqual(BuiltIns.Float, ((Variable)assignment.Left).Type);
         }
 
         [TestMethod()]
@@ -71,7 +72,7 @@ namespace Quirk.Tests
             {
                 var a1 = (Assignment)module.Statements[0];      // a = 1
                 a = (Variable)a1.Left;
-                Assert.AreEqual(TypeObj.Int, a.Type);
+                Assert.AreEqual(BuiltIns.Int, a.Type);
             }
 
             {
@@ -82,7 +83,7 @@ namespace Quirk.Tests
 
                 var a2 = (Assignment)f.Statements[0];           // a = 2
                 Assert.AreEqual(a, a2.Left);
-                Assert.AreEqual(TypeObj.Int, a.Type);           // no changes
+                Assert.AreEqual(BuiltIns.Int, a.Type);           // no changes
 
                 var bx = (Assignment)f.Statements[1];           // b = x
                 var b = (Variable)bx.Left;
@@ -95,7 +96,7 @@ namespace Quirk.Tests
                 var a3 = (Assignment)g.Statements[0];           // a = 3
                 var by = (Assignment)g.Statements[1];           // b = y
                 var cy = (Assignment)g.Statements[2];           // c = y
-                Assert.AreEqual(TypeObj.Int, ((Variable)a3.Left).Type);
+                Assert.AreEqual(BuiltIns.Int, ((Variable)a3.Left).Type);
                 Assert.AreEqual(null, ((Variable)by.Left).Type);
                 Assert.AreEqual(null, ((Variable)cy.Left).Type);
             }
@@ -104,11 +105,11 @@ namespace Quirk.Tests
                 var call = (FuncCall)eval.Expr;
                 // spec f(Int)
                 var f = (Function)call.Func;
-                Assert.AreEqual(TypeObj.Int, f.Parameters[0].Type);
+                Assert.AreEqual(BuiltIns.Int, f.Parameters[0].Type);
                 var a2 = (Assignment)f.Statements[0];
-                Assert.AreEqual(TypeObj.Int, ((Variable)a2.Left).Type);
+                Assert.AreEqual(BuiltIns.Int, ((Variable)a2.Left).Type);
                 var bx = (Assignment)f.Statements[1];
-                Assert.AreEqual(TypeObj.Int, ((Variable)bx.Left).Type);
+                Assert.AreEqual(BuiltIns.Int, ((Variable)bx.Left).Type);
                 var defG = (FuncDef)f.Statements[2];
                 {
                     // template g
@@ -117,8 +118,8 @@ namespace Quirk.Tests
                     var a3 = (Assignment)g.Statements[0];
                     var by = (Assignment)g.Statements[1];
                     var cy = (Assignment)g.Statements[2];
-                    Assert.AreEqual(TypeObj.Int, ((Variable)a3.Left).Type);     // global
-                    Assert.AreEqual(TypeObj.Int, ((Variable)by.Left).Type);     // closure
+                    Assert.AreEqual(BuiltIns.Int, ((Variable)a3.Left).Type);     // global
+                    Assert.AreEqual(BuiltIns.Int, ((Variable)by.Left).Type);     // closure
                     Assert.AreEqual(null, ((Variable)cy.Left).Type);
                 }
                 var evalG = (Evaluation)f.Statements[3];
@@ -126,13 +127,13 @@ namespace Quirk.Tests
                     // spec g(Int)
                     var callG = (FuncCall)evalG.Expr;
                     var g = (Function)callG.Func;
-                    Assert.AreEqual(TypeObj.Int, g.Parameters[0].Type);
+                    Assert.AreEqual(BuiltIns.Int, g.Parameters[0].Type);
                     var a3 = (Assignment)g.Statements[0];
                     var by = (Assignment)g.Statements[1];
                     var cy = (Assignment)g.Statements[2];
-                    Assert.AreEqual(TypeObj.Int, ((Variable)a3.Left).Type);
-                    Assert.AreEqual(TypeObj.Int, ((Variable)by.Left).Type);
-                    Assert.AreEqual(TypeObj.Int, ((Variable)cy.Left).Type);
+                    Assert.AreEqual(BuiltIns.Int, ((Variable)a3.Left).Type);
+                    Assert.AreEqual(BuiltIns.Int, ((Variable)by.Left).Type);
+                    Assert.AreEqual(BuiltIns.Int, ((Variable)cy.Left).Type);
                 }
             }
             {
@@ -140,11 +141,11 @@ namespace Quirk.Tests
                 var call = (FuncCall)eval.Expr;
                 // spec f(Float)
                 var f = (Function)call.Func;
-                Assert.AreEqual(TypeObj.Float, f.Parameters[0].Type);
+                Assert.AreEqual(BuiltIns.Float, f.Parameters[0].Type);
                 var a2 = (Assignment)f.Statements[0];
-                Assert.AreEqual(TypeObj.Int, ((Variable)a2.Left).Type);
+                Assert.AreEqual(BuiltIns.Int, ((Variable)a2.Left).Type);
                 var bx = (Assignment)f.Statements[1];
-                Assert.AreEqual(TypeObj.Float, ((Variable)bx.Left).Type);
+                Assert.AreEqual(BuiltIns.Float, ((Variable)bx.Left).Type);
                 var defG = (FuncDef)f.Statements[2];
                 {
                     // template g
@@ -153,8 +154,8 @@ namespace Quirk.Tests
                     var a3 = (Assignment)g.Statements[0];
                     var by = (Assignment)g.Statements[1];
                     var cy = (Assignment)g.Statements[2];
-                    Assert.AreEqual(TypeObj.Int, ((Variable)a3.Left).Type);
-                    Assert.AreEqual(TypeObj.Float, ((Variable)by.Left).Type);
+                    Assert.AreEqual(BuiltIns.Int, ((Variable)a3.Left).Type);
+                    Assert.AreEqual(BuiltIns.Float, ((Variable)by.Left).Type);
                     Assert.AreEqual(null, ((Variable)cy.Left).Type);
                 }
                 var evalG = (Evaluation)f.Statements[3];
@@ -162,13 +163,13 @@ namespace Quirk.Tests
                     // spec g(Float)
                     var callG = (FuncCall)evalG.Expr;
                     var g = (Function)callG.Func;
-                    Assert.AreEqual(TypeObj.Float, g.Parameters[0].Type);
+                    Assert.AreEqual(BuiltIns.Float, g.Parameters[0].Type);
                     var a3 = (Assignment)g.Statements[0];
                     var by = (Assignment)g.Statements[1];
                     var cy = (Assignment)g.Statements[2];
-                    Assert.AreEqual(TypeObj.Int, ((Variable)a3.Left).Type);
-                    Assert.AreEqual(TypeObj.Float, ((Variable)by.Left).Type);
-                    Assert.AreEqual(TypeObj.Float, ((Variable)cy.Left).Type);
+                    Assert.AreEqual(BuiltIns.Int, ((Variable)a3.Left).Type);
+                    Assert.AreEqual(BuiltIns.Float, ((Variable)by.Left).Type);
+                    Assert.AreEqual(BuiltIns.Float, ((Variable)cy.Left).Type);
                 }
             }
         }
