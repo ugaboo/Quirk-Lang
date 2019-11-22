@@ -1,0 +1,5 @@
+﻿def first():
+	return second()
+
+def second():
+	return True

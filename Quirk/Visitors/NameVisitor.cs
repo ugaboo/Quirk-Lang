@@ -9,6 +9,7 @@ namespace Quirk.Visitors
     public partial class NameVisitor : IVisitor
     {
         Stack<NameTable> nameTables = new Stack<NameTable>();
+        Stack<Function> deferedDefs = new Stack<Function>();
 
         ProgObj Find(string name)
         {
@@ -46,6 +47,9 @@ namespace Quirk.Visitors
             foreach (var statement in module.Statements) {
                 statement.Accept(this);
             }
+            while (deferedDefs.Count > 0) {
+                deferedDefs.Pop().Accept(this);
+            }
             nameTables.Pop();
         }
 
@@ -71,6 +75,9 @@ namespace Quirk.Visitors
             nameTables.Push(funcTable);
             foreach (var statement in func.Statements) {
                 statement.Accept(this);
+            }
+            while (deferedDefs.Count > 0) {
+                deferedDefs.Pop().Accept(this);
             }
             nameTables.Pop();
         }
@@ -102,7 +109,8 @@ namespace Quirk.Visitors
             }
             overload.Funcs.Add(func);
             nameTables.Peek()[name] = overload;
-            func.Accept(this);
+            //func.Accept(this);
+            deferedDefs.Push(func);
         }
 
         public void Visit(Assignment assignment)
@@ -139,6 +147,10 @@ namespace Quirk.Visitors
                 Replace(ref arg);
                 args[i] = arg;
             }
+
+            while (deferedDefs.Count > 0) {
+                deferedDefs.Pop().Accept(this);
+            }
         }
 
         public void Visit(ReturnStmnt returnStmnt)
@@ -169,15 +181,46 @@ namespace Quirk.Visitors
             table["Bool"] = BuiltIns.Bool;
 
             var print = new Overload("print");
-            print.Funcs.Add(new Function(null, "print", BuiltIns.Int));
+            print.Funcs.Add(BuiltIns.Print_Int);
+            print.Funcs.Add(BuiltIns.Print_Float);
+            print.Funcs.Add(BuiltIns.Print_Bool);
             table["print"] = print;
 
             var add = new Overload("__add__");
             add.Funcs.Add(BuiltIns.Add_Int_Int);
-            add.Funcs.Add(BuiltIns.Add_Float_Int);
             add.Funcs.Add(BuiltIns.Add_Int_Float);
+            add.Funcs.Add(BuiltIns.Add_Float_Int);
             add.Funcs.Add(BuiltIns.Add_Float_Float);
+            add.Funcs.Add(BuiltIns.Add_Int_Bool);
+            add.Funcs.Add(BuiltIns.Add_Bool_Int);
+            add.Funcs.Add(BuiltIns.Add_Bool_Bool);
+            add.Funcs.Add(BuiltIns.Add_Float_Bool);
+            add.Funcs.Add(BuiltIns.Add_Bool_Float);
             table["__add__"] = add;
+
+            var sub = new Overload("__sub__");
+            sub.Funcs.Add(BuiltIns.Sub_Int_Int);
+            sub.Funcs.Add(BuiltIns.Sub_Int_Float);
+            sub.Funcs.Add(BuiltIns.Sub_Float_Int);
+            sub.Funcs.Add(BuiltIns.Sub_Float_Float);
+            sub.Funcs.Add(BuiltIns.Sub_Int_Bool);
+            sub.Funcs.Add(BuiltIns.Sub_Bool_Int);
+            sub.Funcs.Add(BuiltIns.Sub_Bool_Bool);
+            sub.Funcs.Add(BuiltIns.Sub_Float_Bool);
+            sub.Funcs.Add(BuiltIns.Sub_Bool_Float);
+            table["__sub__"] = sub;
+
+            var mul = new Overload("__mul__");
+            mul.Funcs.Add(BuiltIns.Mul_Int_Int);
+            mul.Funcs.Add(BuiltIns.Mul_Int_Float);
+            mul.Funcs.Add(BuiltIns.Mul_Float_Int);
+            mul.Funcs.Add(BuiltIns.Mul_Float_Float);
+            mul.Funcs.Add(BuiltIns.Mul_Int_Bool);
+            mul.Funcs.Add(BuiltIns.Mul_Bool_Int);
+            mul.Funcs.Add(BuiltIns.Mul_Bool_Bool);
+            mul.Funcs.Add(BuiltIns.Mul_Float_Bool);
+            mul.Funcs.Add(BuiltIns.Mul_Bool_Float);
+            table["__mul__"] = mul;
         }
     }
 }

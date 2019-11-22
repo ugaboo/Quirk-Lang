@@ -64,8 +64,9 @@ namespace Quirk.Visitors
                 values.Push(funcLLVM);
             } else {
                 var name = DetermineName(func);
+                var retType = func.RetType != null ? ((AST.TypeObj)func.RetType).ToLLVM() : LLVM.VoidType();
                 var paramTypes = GetTypes(func.Parameters);
-                llvmFuncs[func] = funcLLVM = LLVM.AddFunction(moduleLLVM, name, LLVM.FunctionType(LLVM.VoidType(), paramTypes, false));
+                llvmFuncs[func] = funcLLVM = LLVM.AddFunction(moduleLLVM, name, LLVM.FunctionType(retType, paramTypes, false));
                 LLVM.SetLinkage(funcLLVM, LLVMLinkage.LLVMExternalLinkage);
 
                 for (var i = 0; i < func.Parameters.Count; i += 1) {
@@ -78,6 +79,9 @@ namespace Quirk.Visitors
                 blocks.Push(block);
                 foreach (var statement in func.Statements) {
                     statement.Accept(this);
+                }
+                if (func.RetType == null) {
+                    LLVM.BuildRetVoid(builder);
                 }
                 blocks.Pop();
 
@@ -154,41 +158,39 @@ namespace Quirk.Visitors
             LLVM.PositionBuilderAtEnd(builder, blocks.Peek());
             var funcCallLLVM = LLVM.BuildCall(builder, funcLLVM, args, "");
             values.Push(funcCallLLVM);
-
-
-            //if (funcCall.Func is AST.Intrinsic intrinsic) {
-            //    var args = new LLVMValueRef[funcCall.Args.Count + 1];
-            //    args[0] = dstr;
-            //    for (var i = 0; i < funcCall.Args.Count; i += 1) {
-            //        var arg = funcCall.Args[i];
-            //        if (arg is AST.Variable v) {
-            //            var load = LLVM.BuildLoad(builder, values[v], "arg");
-            //            args[i + 1] = load;
-            //        }
-            //    }
-            //    LLVM.BuildCall(builder, values[intrinsic], args, "printf_result");
-            //}
         }
 
         public void Visit(AST.ReturnStmnt returnStmnt)
         {
+            var vals = new List<LLVMValueRef>();
+            foreach (var val in returnStmnt.Values) {
+                val.Accept(this);
+                vals.Add(values.Pop());
+            }
+
+            LLVM.PositionBuilderAtEnd(builder, blocks.Peek());
+            if (vals.Count == 0) {
+                values.Push(LLVM.BuildRetVoid(builder));
+            } else {
+                values.Push(LLVM.BuildRet(builder, vals[0]));
+            }
         }
-               
+
         public void Visit(AST.NameObj nameObj) { throw new InvalidOperationException(); }
 
         public void Visit(AST.ConstBool constBool)
         {
-            values.Push(LLVM.ConstInt(LLVM.Int8Type(), Convert.ToUInt64(constBool.Value), false));
+            values.Push(LLVM.ConstInt(BuiltIns.Bool.ToLLVM(), Convert.ToUInt64(constBool.Value), false));
         }
 
         public void Visit(AST.ConstInt constInt)
         {
-            values.Push(LLVM.ConstInt(LLVM.Int32Type(), Convert.ToUInt64(constInt.Value), false));
+            values.Push(LLVM.ConstInt(BuiltIns.Int.ToLLVM(), Convert.ToUInt64(constInt.Value), false));
         }
 
         public void Visit(AST.ConstFloat constFloat)
         {
-            values.Push(LLVM.ConstReal(LLVM.FloatType(), Convert.ToDouble(constFloat.Value)));
+            values.Push(LLVM.ConstReal(BuiltIns.Float.ToLLVM(), Convert.ToDouble(constFloat.Value)));
         }
 
         public void Visit(AST.TypeObj typeObj)

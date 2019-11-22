@@ -171,6 +171,14 @@ namespace Quirk.Tests
             AssertCall(f3, f2.Statements[2]);
         }
 
+
+        [TestMethod()]
+        public void DeferedDef()
+        {
+            new Parser("Code/NameVisitor/DeferedDef.qk", "DeferedDef", out var module);
+            new Visitors.NameVisitor(module);
+        }
+
         [TestMethod()]
         public void BuiltIns()
         {

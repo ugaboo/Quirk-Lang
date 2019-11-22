@@ -59,7 +59,13 @@ namespace Quirk.Visitors
 
         public void Visit(AST.Tuple tuple) { throw new Exception("Not implemented"); }
 
-        public void Visit(FuncDef funcDef) { }
+        public void Visit(FuncDef funcDef)
+        {
+            if (funcDef.Func.TemplateParamsCount == 0) {
+                funcDef.Func.Accept(this);
+                result.Pop();
+            }
+        }
 
         public void Visit(Assignment assignment)
         {
@@ -87,36 +93,38 @@ namespace Quirk.Visitors
 
         public void Visit(FuncCall funcCall)
         {
-            var overload = funcCall.Func as Overload;
-            if (overload == null) {
+            if (funcCall.Func is Function) {
+                funcCall.Func.Accept(this);
+            } else if (funcCall.Func is Overload overload) {
+                var types = new List<TypeObj>();
+                foreach (var arg in funcCall.Args) {
+                    arg.Accept(this);
+                    var type = result.Pop();
+                    if (type == null) {
+                        throw new CompilationError(CantDetermineType);
+                    }
+                    types.Add(type);
+                }
+                var func = overload.Find(types);
+                if (func == null) {
+                    throw new CompilationError(ObjectIsNotDefined);
+                }
+                if (func.TemplateParamsCount > 0) {
+                    var spec = specFuncs.Find(func, types);
+                    if (spec == null) {
+                        new TemplateVisitor(func, out spec);
+                        for (var i = 0; i < types.Count; i += 1) {
+                            spec.Parameters[i].Type = types[i];
+                        }
+                    }
+                    funcCall.Func = spec;
+                } else {
+                    funcCall.Func = func;
+                }
+                funcCall.Func.Accept(this);
+            } else {
                 throw new CompilationError(ObjectIsNotCallable);
             }
-            var types = new List<TypeObj>();
-            foreach (var arg in funcCall.Args) {
-                arg.Accept(this);
-                var type = result.Pop();
-                if (type == null) {
-                    throw new CompilationError(CantDetermineType);
-                }
-                types.Add(type);
-            }
-            var func = overload.Find(types);
-            if (func == null) {
-                throw new CompilationError(ObjectIsNotDefined);
-            }
-            if (func.TemplateParamsCount > 0) {
-                var spec = specFuncs.Find(func, types);
-                if (spec == null) {
-                    new TemplateVisitor(func, out spec);
-                    for (var i = 0; i < types.Count; i += 1) {
-                        spec.Parameters[i].Type = types[i];
-                    }
-                }
-                funcCall.Func = spec;
-            } else {
-                funcCall.Func = func;
-            }
-            funcCall.Func.Accept(this);
         }
 
         public void Visit(ReturnStmnt returnStmnt)
@@ -131,10 +139,11 @@ namespace Quirk.Visitors
                 }
             } else if (returnStmnt.Values.Count == 1) {
                 returnStmnt.Values[0].Accept(this);
-                if (func.RetType != null) {
+                var type = result.Pop();
+                if (func.RetType != null && func.RetType != type) {
                     throw new Exception("Not implemented");     // type generaization or type conversion
                 } else {
-                    func.RetType = result.Pop();
+                    func.RetType = type;
                 }
             } else {
                 throw new Exception("Not implemented");         // tuple

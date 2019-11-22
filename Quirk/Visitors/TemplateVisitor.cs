@@ -135,7 +135,7 @@ namespace Quirk.Visitors
 
             foreach (var val in returnStmnt.Values) {
                 val.Accept(this);
-                returnStmnt.Values.Add(result.Pop());
+                clone.Values.Add(result.Pop());
             }
 
             result.Push(clone);

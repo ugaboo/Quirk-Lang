@@ -1,0 +1,17 @@
+﻿def f():
+	print(101)
+
+def f(x, y):
+	return x + y + 1
+
+def g() -> Int:
+	return 1
+
+def g(x) -> Int:
+	return x
+
+print(f(1, 2))
+f()
+print(g())
+print(g(11))
+#print(g(11.1))		# not implemented

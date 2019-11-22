@@ -13,7 +13,7 @@ namespace Quirk.Helpers
             } else if (obj == BuiltIns.Float) {
                 return LLVM.FloatType();
             } else if (obj == BuiltIns.Bool) {
-                return LLVM.Int8Type();
+                return LLVM.Int1Type();
             } else {
                 throw new ArgumentException();
             }
