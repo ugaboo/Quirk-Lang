@@ -22,9 +22,15 @@ namespace Quirk.Helpers
 
             printf = LLVM.AddFunction(module, "printf", LLVM.FunctionType(LLVM.Int32Type(), new[] { LLVM.PointerType(LLVM.Int8Type(), 0) }, true));
 
+            #region print
+
             Gen_Print_Int();
             Gen_Print_Float();
             Gen_Print_Bool();
+
+            #endregion
+
+            #region __add__
 
             Gen_Add_Int_Int();
             Gen_Add_Int_Float();
@@ -36,6 +42,10 @@ namespace Quirk.Helpers
             Gen_Add_Float_Bool();
             Gen_Add_Bool_Float();
 
+            #endregion
+
+            #region __sub__
+
             Gen_Sub_Int_Int();
             Gen_Sub_Int_Float();
             Gen_Sub_Float_Int();
@@ -46,6 +56,10 @@ namespace Quirk.Helpers
             Gen_Sub_Float_Bool();
             Gen_Sub_Bool_Float();
 
+            #endregion
+
+            #region __mul__
+
             Gen_Mul_Int_Int();
             Gen_Mul_Int_Float();
             Gen_Mul_Float_Int();
@@ -55,6 +69,36 @@ namespace Quirk.Helpers
             Gen_Mul_Bool_Bool();
             Gen_Mul_Float_Bool();
             Gen_Mul_Bool_Float();
+
+            #endregion
+
+            #region __truediv__
+
+            Gen_TrueDiv_Int_Int();
+            Gen_TrueDiv_Int_Float();
+            Gen_TrueDiv_Float_Int();
+            Gen_TrueDiv_Float_Float();
+            Gen_TrueDiv_Int_Bool();
+            Gen_TrueDiv_Bool_Int();
+            Gen_TrueDiv_Bool_Bool();
+            Gen_TrueDiv_Float_Bool();
+            Gen_TrueDiv_Bool_Float();
+
+            #endregion
+
+            #region __floordiv__
+
+            Gen_FloorDiv_Int_Int();
+            Gen_FloorDiv_Int_Float();
+            Gen_FloorDiv_Float_Int();
+            Gen_FloorDiv_Float_Float();
+            Gen_FloorDiv_Int_Bool();
+            Gen_FloorDiv_Bool_Int();
+            Gen_FloorDiv_Bool_Bool();
+            Gen_FloorDiv_Float_Bool();
+            Gen_FloorDiv_Bool_Float();
+
+            #endregion
         }
 
         public LLVMValueRef Find(ProgObj obj)
@@ -357,6 +401,175 @@ namespace Quirk.Helpers
             var conv = LLVM.BuildSIToFP(builder, ext, LLVM.FloatType(), "");
             var op = LLVM.BuildFMul(builder, conv, par[1], "");
             LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __truediv__
+
+        void Gen_TrueDiv_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.TrueDiv_Int_Int);
+            var conv0 = LLVM.BuildSIToFP(builder, par[0], BuiltIns.Float.ToLLVM(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, par[1], BuiltIns.Float.ToLLVM(), "");
+            var op = LLVM.BuildFDiv(builder, conv0, conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_TrueDiv_Int_Float()
+        {
+            var par = GenHeader(BuiltIns.TrueDiv_Int_Float);
+            var conv = LLVM.BuildSIToFP(builder, par[0], BuiltIns.Float.ToLLVM(), "");
+            var op = LLVM.BuildFDiv(builder, conv, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_TrueDiv_Float_Int()
+        {
+            var par = GenHeader(BuiltIns.TrueDiv_Float_Int);
+            var conv = LLVM.BuildSIToFP(builder, par[1], BuiltIns.Float.ToLLVM(), "");
+            var op = LLVM.BuildFDiv(builder, par[0], conv, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_TrueDiv_Float_Float()
+        {
+            var par = GenHeader(BuiltIns.TrueDiv_Float_Float);
+            var op = LLVM.BuildFDiv(builder, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_TrueDiv_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.TrueDiv_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], BuiltIns.Int.ToLLVM(), "");
+            var conv0 = LLVM.BuildSIToFP(builder, par[0], BuiltIns.Float.ToLLVM(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, ext1, BuiltIns.Float.ToLLVM(), "");
+            var op = LLVM.BuildFDiv(builder, conv0, conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_TrueDiv_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.TrueDiv_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], BuiltIns.Int.ToLLVM(), "");
+            var conv0 = LLVM.BuildSIToFP(builder, ext0, BuiltIns.Float.ToLLVM(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, par[1], BuiltIns.Float.ToLLVM(), "");
+            var op = LLVM.BuildFDiv(builder, conv0, conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_TrueDiv_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.TrueDiv_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], BuiltIns.Int.ToLLVM(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], BuiltIns.Int.ToLLVM(), "");
+            var conv0 = LLVM.BuildSIToFP(builder, ext0, BuiltIns.Float.ToLLVM(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, ext1, BuiltIns.Float.ToLLVM(), "");
+            var op = LLVM.BuildFDiv(builder, conv0, conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_TrueDiv_Float_Bool()
+        {
+            var par = GenHeader(BuiltIns.TrueDiv_Float_Bool);
+            var ext = LLVM.BuildZExt(builder, par[1], BuiltIns.Int.ToLLVM(), "");
+            var conv = LLVM.BuildSIToFP(builder, ext, BuiltIns.Float.ToLLVM(), "");
+            var op = LLVM.BuildFDiv(builder, par[0], conv, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_TrueDiv_Bool_Float()
+        {
+            var par = GenHeader(BuiltIns.TrueDiv_Bool_Float);
+            var ext = LLVM.BuildZExt(builder, par[0], BuiltIns.Int.ToLLVM(), "");
+            var conv = LLVM.BuildSIToFP(builder, ext, BuiltIns.Float.ToLLVM(), "");
+            var op = LLVM.BuildFDiv(builder, conv, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __floordiv__
+
+        void Gen_FloorDiv_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.FloorDiv_Int_Int);
+            var op = LLVM.BuildSDiv(builder, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_FloorDiv_Int_Float()
+        {
+            var par = GenHeader(BuiltIns.FloorDiv_Int_Float);
+            var conv = LLVM.BuildFPToSI(builder, par[1], BuiltIns.Int.ToLLVM(), "");
+            var op = LLVM.BuildSDiv(builder, par[0], conv, "");
+            var fp = LLVM.BuildSIToFP(builder, op, BuiltIns.Float.ToLLVM(), "");
+            LLVM.BuildRet(builder, fp);
+        }
+
+        void Gen_FloorDiv_Float_Int()
+        {
+            var par = GenHeader(BuiltIns.FloorDiv_Float_Int);
+            var conv = LLVM.BuildFPToSI(builder, par[0], BuiltIns.Int.ToLLVM(), "");
+            var op = LLVM.BuildSDiv(builder, conv, par[1], "");
+            var fp = LLVM.BuildSIToFP(builder, op, BuiltIns.Float.ToLLVM(), "");
+            LLVM.BuildRet(builder, fp);
+        }
+
+        void Gen_FloorDiv_Float_Float()
+        {
+            var par = GenHeader(BuiltIns.FloorDiv_Float_Float);
+            var conv0 = LLVM.BuildFPToSI(builder, par[0], BuiltIns.Int.ToLLVM(), "");
+            var conv1 = LLVM.BuildFPToSI(builder, par[1], BuiltIns.Int.ToLLVM(), "");
+            var op = LLVM.BuildSDiv(builder, conv0, conv1, "");
+            var fp = LLVM.BuildSIToFP(builder, op, BuiltIns.Float.ToLLVM(), "");
+            LLVM.BuildRet(builder, fp);
+        }
+
+        void Gen_FloorDiv_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.FloorDiv_Int_Bool);
+            var ext = LLVM.BuildZExt(builder, par[1], BuiltIns.Int.ToLLVM(), "");
+            var op = LLVM.BuildSDiv(builder, par[0], ext, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_FloorDiv_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.FloorDiv_Bool_Int);
+            var ext = LLVM.BuildZExt(builder, par[0], BuiltIns.Int.ToLLVM(), "");
+            var op = LLVM.BuildSDiv(builder, ext, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_FloorDiv_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.FloorDiv_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], BuiltIns.Int.ToLLVM(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], BuiltIns.Int.ToLLVM(), "");
+            var op = LLVM.BuildSDiv(builder, ext0, ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_FloorDiv_Float_Bool()
+        {
+            var par = GenHeader(BuiltIns.FloorDiv_Float_Bool);
+            var conv = LLVM.BuildFPToSI(builder, par[0], BuiltIns.Int.ToLLVM(), "");
+            var ext = LLVM.BuildZExt(builder, par[1], BuiltIns.Int.ToLLVM(), "");
+            var op = LLVM.BuildSDiv(builder, conv, ext, "");
+            var fp = LLVM.BuildSIToFP(builder, op, BuiltIns.Float.ToLLVM(), "");
+            LLVM.BuildRet(builder, fp);
+        }
+
+        void Gen_FloorDiv_Bool_Float()
+        {
+            var par = GenHeader(BuiltIns.FloorDiv_Bool_Float);
+            var ext = LLVM.BuildZExt(builder, par[0], BuiltIns.Int.ToLLVM(), "");
+            var conv = LLVM.BuildFPToSI(builder, par[1], BuiltIns.Int.ToLLVM(), "");
+            var op = LLVM.BuildSDiv(builder, ext, conv, "");
+            var fp = LLVM.BuildSIToFP(builder, op, BuiltIns.Float.ToLLVM(), "");
+            LLVM.BuildRet(builder, fp);
         }
 
         #endregion

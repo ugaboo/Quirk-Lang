@@ -221,6 +221,30 @@ namespace Quirk.Visitors
             mul.Funcs.Add(BuiltIns.Mul_Float_Bool);
             mul.Funcs.Add(BuiltIns.Mul_Bool_Float);
             table["__mul__"] = mul;
+
+            var truediv = new Overload("__truediv__");
+            truediv.Funcs.Add(BuiltIns.TrueDiv_Int_Int);
+            truediv.Funcs.Add(BuiltIns.TrueDiv_Int_Float);
+            truediv.Funcs.Add(BuiltIns.TrueDiv_Float_Int);
+            truediv.Funcs.Add(BuiltIns.TrueDiv_Float_Float);
+            truediv.Funcs.Add(BuiltIns.TrueDiv_Int_Bool);
+            truediv.Funcs.Add(BuiltIns.TrueDiv_Bool_Int);
+            truediv.Funcs.Add(BuiltIns.TrueDiv_Bool_Bool);
+            truediv.Funcs.Add(BuiltIns.TrueDiv_Float_Bool);
+            truediv.Funcs.Add(BuiltIns.TrueDiv_Bool_Float);
+            table["__truediv__"] = truediv;
+
+            var floordiv = new Overload("__floordiv__");
+            floordiv.Funcs.Add(BuiltIns.FloorDiv_Int_Int);
+            floordiv.Funcs.Add(BuiltIns.FloorDiv_Int_Float);
+            floordiv.Funcs.Add(BuiltIns.FloorDiv_Float_Int);
+            floordiv.Funcs.Add(BuiltIns.FloorDiv_Float_Float);
+            floordiv.Funcs.Add(BuiltIns.FloorDiv_Int_Bool);
+            floordiv.Funcs.Add(BuiltIns.FloorDiv_Bool_Int);
+            floordiv.Funcs.Add(BuiltIns.FloorDiv_Bool_Bool);
+            floordiv.Funcs.Add(BuiltIns.FloorDiv_Float_Bool);
+            floordiv.Funcs.Add(BuiltIns.FloorDiv_Bool_Float);
+            table["__floordiv__"] = floordiv;
         }
     }
 }

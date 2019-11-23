@@ -44,5 +44,25 @@ namespace Quirk.Helpers
         public static readonly Function Mul_Bool_Bool = new Function(Int, "__mul__", Bool, Bool);
         public static readonly Function Mul_Float_Bool = new Function(Float, "__mul__", Float, Bool);
         public static readonly Function Mul_Bool_Float = new Function(Float, "__mul__", Bool, Float);
+
+        public static readonly Function TrueDiv_Int_Int = new Function(Float, "__truediv__", Int, Int);
+        public static readonly Function TrueDiv_Int_Float = new Function(Float, "__truediv__", Int, Float);
+        public static readonly Function TrueDiv_Float_Int = new Function(Float, "__truediv__", Float, Int);
+        public static readonly Function TrueDiv_Float_Float = new Function(Float, "__truediv__", Float, Float);
+        public static readonly Function TrueDiv_Int_Bool = new Function(Float, "__truediv__", Int, Bool);
+        public static readonly Function TrueDiv_Bool_Int = new Function(Float, "__truediv__", Bool, Int);
+        public static readonly Function TrueDiv_Bool_Bool = new Function(Float, "__truediv__", Bool, Bool);
+        public static readonly Function TrueDiv_Float_Bool = new Function(Float, "__truediv__", Float, Bool);
+        public static readonly Function TrueDiv_Bool_Float = new Function(Float, "__truediv__", Bool, Float);
+
+        public static readonly Function FloorDiv_Int_Int = new Function(Int, "__floordiv__", Int, Int);
+        public static readonly Function FloorDiv_Int_Float = new Function(Float, "__floordiv__", Int, Float);
+        public static readonly Function FloorDiv_Float_Int = new Function(Float, "__floordiv__", Float, Int);
+        public static readonly Function FloorDiv_Float_Float = new Function(Float, "__floordiv__", Float, Float);
+        public static readonly Function FloorDiv_Int_Bool = new Function(Int, "__floordiv__", Int, Bool);
+        public static readonly Function FloorDiv_Bool_Int = new Function(Int, "__floordiv__", Bool, Int);
+        public static readonly Function FloorDiv_Bool_Bool = new Function(Int, "__floordiv__", Bool, Bool);
+        public static readonly Function FloorDiv_Float_Bool = new Function(Float, "__floordiv__", Float, Bool);
+        public static readonly Function FloorDiv_Bool_Float = new Function(Float, "__floordiv__", Bool, Float);
     }
 }

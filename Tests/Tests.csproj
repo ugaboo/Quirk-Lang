@@ -28,6 +28,12 @@
     <None Update="Code\CodeGenVisitor\Add.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Code\CodeGenVisitor\FloorDiv.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\CodeGenVisitor\TrueDiv.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Code\CodeGenVisitor\Return.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
