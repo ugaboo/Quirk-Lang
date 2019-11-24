@@ -245,6 +245,30 @@ namespace Quirk.Visitors
             floordiv.Funcs.Add(BuiltIns.FloorDiv_Float_Bool);
             floordiv.Funcs.Add(BuiltIns.FloorDiv_Bool_Float);
             table["__floordiv__"] = floordiv;
+
+            var mod = new Overload("__mod__");
+            mod.Funcs.Add(BuiltIns.Mod_Int_Int);
+            mod.Funcs.Add(BuiltIns.Mod_Int_Float);
+            mod.Funcs.Add(BuiltIns.Mod_Float_Int);
+            mod.Funcs.Add(BuiltIns.Mod_Float_Float);
+            mod.Funcs.Add(BuiltIns.Mod_Int_Bool);
+            mod.Funcs.Add(BuiltIns.Mod_Bool_Int);
+            mod.Funcs.Add(BuiltIns.Mod_Bool_Bool);
+            mod.Funcs.Add(BuiltIns.Mod_Float_Bool);
+            mod.Funcs.Add(BuiltIns.Mod_Bool_Float);
+            table["__mod__"] = mod;
+
+            var pow = new Overload("__pow__");
+            pow.Funcs.Add(BuiltIns.Pow_Int_Int);
+            pow.Funcs.Add(BuiltIns.Pow_Int_Float);
+            pow.Funcs.Add(BuiltIns.Pow_Float_Int);
+            pow.Funcs.Add(BuiltIns.Pow_Float_Float);
+            pow.Funcs.Add(BuiltIns.Pow_Int_Bool);
+            pow.Funcs.Add(BuiltIns.Pow_Bool_Int);
+            pow.Funcs.Add(BuiltIns.Pow_Bool_Bool);
+            pow.Funcs.Add(BuiltIns.Pow_Float_Bool);
+            pow.Funcs.Add(BuiltIns.Pow_Bool_Float);
+            table["__pow__"] = pow;
         }
     }
 }

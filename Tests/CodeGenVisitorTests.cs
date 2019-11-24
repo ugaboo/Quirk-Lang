@@ -61,5 +61,19 @@ namespace Quirk.Tests
             new Parser("Code/CodeGenVisitor/FloorDiv.qk", "FloorDiv", out var module);
             new Visitors.CodeGenVisitor(module);
         }
+
+        [TestMethod()]
+        public void Mod()
+        {
+            new Parser("Code/CodeGenVisitor/Mod.qk", "Mod", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Pow()
+        {
+            new Parser("Code/CodeGenVisitor/Pow.qk", "Pow", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
     }
 }

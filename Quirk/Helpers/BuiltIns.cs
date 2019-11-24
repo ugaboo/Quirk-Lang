@@ -64,5 +64,25 @@ namespace Quirk.Helpers
         public static readonly Function FloorDiv_Bool_Bool = new Function(Int, "__floordiv__", Bool, Bool);
         public static readonly Function FloorDiv_Float_Bool = new Function(Float, "__floordiv__", Float, Bool);
         public static readonly Function FloorDiv_Bool_Float = new Function(Float, "__floordiv__", Bool, Float);
+
+        public static readonly Function Mod_Int_Int = new Function(Int, "__mod__", Int, Int);
+        public static readonly Function Mod_Int_Float = new Function(Float, "__mod__", Int, Float);
+        public static readonly Function Mod_Float_Int = new Function(Float, "__mod__", Float, Int);
+        public static readonly Function Mod_Float_Float = new Function(Float, "__mod__", Float, Float);
+        public static readonly Function Mod_Int_Bool = new Function(Int, "__mod__", Int, Bool);
+        public static readonly Function Mod_Bool_Int = new Function(Int, "__mod__", Bool, Int);
+        public static readonly Function Mod_Bool_Bool = new Function(Int, "__mod__", Bool, Bool);
+        public static readonly Function Mod_Float_Bool = new Function(Float, "__mod__", Float, Bool);
+        public static readonly Function Mod_Bool_Float = new Function(Float, "__mod__", Bool, Float);
+
+        public static readonly Function Pow_Int_Int = new Function(Int, "__pow__", Int, Int);
+        public static readonly Function Pow_Int_Float = new Function(Float, "__pow__", Int, Float);
+        public static readonly Function Pow_Float_Int = new Function(Float, "__pow__", Float, Int);
+        public static readonly Function Pow_Float_Float = new Function(Float, "__pow__", Float, Float);
+        public static readonly Function Pow_Int_Bool = new Function(Int, "__pow__", Int, Bool);
+        public static readonly Function Pow_Bool_Int = new Function(Int, "__pow__", Bool, Int);
+        public static readonly Function Pow_Bool_Bool = new Function(Int, "__pow__", Bool, Bool);
+        public static readonly Function Pow_Float_Bool = new Function(Float, "__pow__", Float, Bool);
+        public static readonly Function Pow_Bool_Float = new Function(Float, "__pow__", Bool, Float);
     }
 }
