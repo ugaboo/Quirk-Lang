@@ -75,5 +75,68 @@ namespace Quirk.Tests
             new Parser("Code/CodeGenVisitor/Pow.qk", "Pow", out var module);
             new Visitors.CodeGenVisitor(module);
         }
+
+        [TestMethod()]
+        public void Pos()
+        {
+            new Parser("Code/CodeGenVisitor/Pos.qk", "Pos", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Neg()
+        {
+            new Parser("Code/CodeGenVisitor/Neg.qk", "Neg", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Lt()
+        {
+            new Parser("Code/CodeGenVisitor/Lt.qk", "Lt", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Gt()
+        {
+            new Parser("Code/CodeGenVisitor/Gt.qk", "Gt", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Le()
+        {
+            new Parser("Code/CodeGenVisitor/Le.qk", "Le", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Ge()
+        {
+            new Parser("Code/CodeGenVisitor/Ge.qk", "Ge", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Eq()
+        {
+            new Parser("Code/CodeGenVisitor/Eq.qk", "Eq", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Ne()
+        {
+            new Parser("Code/CodeGenVisitor/Ne.qk", "Ne", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Not()
+        {
+            new Parser("Code/CodeGenVisitor/Not.qk", "Not", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
     }
 }

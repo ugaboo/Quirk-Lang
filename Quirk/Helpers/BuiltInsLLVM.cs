@@ -128,6 +128,114 @@ namespace Quirk.Helpers
             Gen_Pow_Bool_Float();
 
             #endregion
+
+            #region __pos__
+
+            Gen_Pos_Int();
+            Gen_Pos_Float();
+            Gen_Pos_Bool();
+
+            #endregion
+
+            #region __neg__
+
+            Gen_Neg_Int();
+            Gen_Neg_Float();
+            Gen_Neg_Bool();
+
+            #endregion
+
+            #region __lt__
+
+            Gen_Lt_Int_Int();
+            Gen_Lt_Int_Float();
+            Gen_Lt_Float_Int();
+            Gen_Lt_Float_Float();
+            Gen_Lt_Int_Bool();
+            Gen_Lt_Bool_Int();
+            Gen_Lt_Bool_Bool();
+            Gen_Lt_Float_Bool();
+            Gen_Lt_Bool_Float();
+
+            #endregion
+
+            #region __gt__
+
+            Gen_Gt_Int_Int();
+            Gen_Gt_Int_Float();
+            Gen_Gt_Float_Int();
+            Gen_Gt_Float_Float();
+            Gen_Gt_Int_Bool();
+            Gen_Gt_Bool_Int();
+            Gen_Gt_Bool_Bool();
+            Gen_Gt_Float_Bool();
+            Gen_Gt_Bool_Float();
+
+            #endregion
+
+            #region __le__
+
+            Gen_Le_Int_Int();
+            Gen_Le_Int_Float();
+            Gen_Le_Float_Int();
+            Gen_Le_Float_Float();
+            Gen_Le_Int_Bool();
+            Gen_Le_Bool_Int();
+            Gen_Le_Bool_Bool();
+            Gen_Le_Float_Bool();
+            Gen_Le_Bool_Float();
+
+            #endregion
+
+            #region __ge__
+
+            Gen_Ge_Int_Int();
+            Gen_Ge_Int_Float();
+            Gen_Ge_Float_Int();
+            Gen_Ge_Float_Float();
+            Gen_Ge_Int_Bool();
+            Gen_Ge_Bool_Int();
+            Gen_Ge_Bool_Bool();
+            Gen_Ge_Float_Bool();
+            Gen_Ge_Bool_Float();
+
+            #endregion
+
+            #region __eq__
+
+            Gen_Eq_Int_Int();
+            Gen_Eq_Int_Float();
+            Gen_Eq_Float_Int();
+            Gen_Eq_Float_Float();
+            Gen_Eq_Int_Bool();
+            Gen_Eq_Bool_Int();
+            Gen_Eq_Bool_Bool();
+            Gen_Eq_Float_Bool();
+            Gen_Eq_Bool_Float();
+
+            #endregion
+
+            #region __ne__
+
+            Gen_Ne_Int_Int();
+            Gen_Ne_Int_Float();
+            Gen_Ne_Float_Int();
+            Gen_Ne_Float_Float();
+            Gen_Ne_Int_Bool();
+            Gen_Ne_Bool_Int();
+            Gen_Ne_Bool_Bool();
+            Gen_Ne_Float_Bool();
+            Gen_Ne_Bool_Float();
+
+            #endregion
+
+            #region __not__
+
+            Gen_Not_Int();
+            Gen_Not_Float();
+            Gen_Not_Bool();
+
+            #endregion
         }
 
         public LLVMValueRef Find(ProgObj obj)
@@ -776,6 +884,552 @@ namespace Quirk.Helpers
             var call = LLVM.BuildCall(builder, pow, new[] { conv0, ext1 }, "");
             var fp = LLVM.BuildFPTrunc(builder, call, LLVM.FloatType(), "");
             LLVM.BuildRet(builder, fp);
+        }
+
+        #endregion
+
+        #region __pos__
+
+        void Gen_Pos_Int()
+        {
+            var par = GenHeader(BuiltIns.Pos_Int);
+            LLVM.BuildRet(builder, par[0]);
+        }
+
+        void Gen_Pos_Float()
+        {
+            var par = GenHeader(BuiltIns.Pos_Float);
+            LLVM.BuildRet(builder, par[0]);
+        }
+
+        void Gen_Pos_Bool()
+        {
+            var par = GenHeader(BuiltIns.Pos_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            LLVM.BuildRet(builder, ext0);
+        }
+
+        #endregion
+
+        #region __neg__
+
+        void Gen_Neg_Int()
+        {
+            var par = GenHeader(BuiltIns.Neg_Int);
+            var zero = LLVM.ConstInt(LLVM.Int32Type(), 0, false);
+            var op = LLVM.BuildNSWSub(builder, zero, par[0], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Neg_Float()
+        {
+            var par = GenHeader(BuiltIns.Neg_Float);
+            var zero = LLVM.ConstReal(LLVM.FloatType(), 0.0);
+            var op = LLVM.BuildFSub(builder, zero, par[0], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Neg_Bool()
+        {
+            var par = GenHeader(BuiltIns.Neg_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var zero = LLVM.ConstInt(LLVM.Int32Type(), 0, false);
+            var op = LLVM.BuildNSWSub(builder, zero, ext0, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __lt__
+
+        void Gen_Lt_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.Lt_Int_Int);
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSLT, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Lt_Int_Float()
+        {
+            var par = GenHeader(BuiltIns.Lt_Int_Float);
+            var conv0 = LLVM.BuildSIToFP(builder, par[0], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLT, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Lt_Float_Int()
+        {
+            var par = GenHeader(BuiltIns.Lt_Float_Int);
+            var conv1 = LLVM.BuildSIToFP(builder, par[1], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLT, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Lt_Float_Float()
+        {
+            var par = GenHeader(BuiltIns.Lt_Float_Float);
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLT, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Lt_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.Lt_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSLT, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Lt_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.Lt_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSLT, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Lt_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.Lt_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSLT, ext0, ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Lt_Float_Bool()
+        {
+            var par = GenHeader(BuiltIns.Lt_Float_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, ext1, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLT, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Lt_Bool_Float()
+        {
+            var par = GenHeader(BuiltIns.Lt_Bool_Float);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var conv0 = LLVM.BuildSIToFP(builder, ext0, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLT, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __gt__
+
+        void Gen_Gt_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.Gt_Int_Int);
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSGT, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Gt_Int_Float()
+        {
+            var par = GenHeader(BuiltIns.Gt_Int_Float);
+            var conv0 = LLVM.BuildSIToFP(builder, par[0], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGT, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Gt_Float_Int()
+        {
+            var par = GenHeader(BuiltIns.Gt_Float_Int);
+            var conv1 = LLVM.BuildSIToFP(builder, par[1], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGT, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Gt_Float_Float()
+        {
+            var par = GenHeader(BuiltIns.Gt_Float_Float);
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGT, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Gt_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.Gt_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSGT, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Gt_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.Gt_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSGT, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Gt_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.Gt_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSGT, ext0, ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Gt_Float_Bool()
+        {
+            var par = GenHeader(BuiltIns.Gt_Float_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, ext1, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGT, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Gt_Bool_Float()
+        {
+            var par = GenHeader(BuiltIns.Gt_Bool_Float);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var conv0 = LLVM.BuildSIToFP(builder, ext0, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGT, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __le__
+
+        void Gen_Le_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.Le_Int_Int);
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSLE, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Le_Int_Float()
+        {
+            var par = GenHeader(BuiltIns.Le_Int_Float);
+            var conv0 = LLVM.BuildSIToFP(builder, par[0], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLE, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Le_Float_Int()
+        {
+            var par = GenHeader(BuiltIns.Le_Float_Int);
+            var conv1 = LLVM.BuildSIToFP(builder, par[1], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLE, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Le_Float_Float()
+        {
+            var par = GenHeader(BuiltIns.Le_Float_Float);
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLE, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Le_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.Le_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSLE, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Le_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.Le_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSLE, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Le_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.Le_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSLE, ext0, ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Le_Float_Bool()
+        {
+            var par = GenHeader(BuiltIns.Le_Float_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, ext1, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLE, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Le_Bool_Float()
+        {
+            var par = GenHeader(BuiltIns.Le_Bool_Float);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var conv0 = LLVM.BuildSIToFP(builder, ext0, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOLE, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __ge__
+
+        void Gen_Ge_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.Ge_Int_Int);
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSGE, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ge_Int_Float()
+        {
+            var par = GenHeader(BuiltIns.Ge_Int_Float);
+            var conv0 = LLVM.BuildSIToFP(builder, par[0], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGE, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ge_Float_Int()
+        {
+            var par = GenHeader(BuiltIns.Ge_Float_Int);
+            var conv1 = LLVM.BuildSIToFP(builder, par[1], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGE, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ge_Float_Float()
+        {
+            var par = GenHeader(BuiltIns.Ge_Float_Float);
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGE, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ge_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.Ge_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSGE, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ge_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.Ge_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSGE, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ge_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.Ge_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntSGE, ext0, ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ge_Float_Bool()
+        {
+            var par = GenHeader(BuiltIns.Ge_Float_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, ext1, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGE, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ge_Bool_Float()
+        {
+            var par = GenHeader(BuiltIns.Ge_Bool_Float);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var conv0 = LLVM.BuildSIToFP(builder, ext0, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOGE, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __eq__
+
+        void Gen_Eq_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.Eq_Int_Int);
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntEQ, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Eq_Int_Float()
+        {
+            var par = GenHeader(BuiltIns.Eq_Int_Float);
+            var conv0 = LLVM.BuildSIToFP(builder, par[0], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOEQ, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Eq_Float_Int()
+        {
+            var par = GenHeader(BuiltIns.Eq_Float_Int);
+            var conv1 = LLVM.BuildSIToFP(builder, par[1], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOEQ, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Eq_Float_Float()
+        {
+            var par = GenHeader(BuiltIns.Eq_Float_Float);
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOEQ, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Eq_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.Eq_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntEQ, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Eq_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.Eq_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntEQ, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Eq_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.Eq_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntEQ, ext0, ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Eq_Float_Bool()
+        {
+            var par = GenHeader(BuiltIns.Eq_Float_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, ext1, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOEQ, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Eq_Bool_Float()
+        {
+            var par = GenHeader(BuiltIns.Eq_Bool_Float);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var conv0 = LLVM.BuildSIToFP(builder, ext0, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealOEQ, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __ne__
+
+        void Gen_Ne_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.Ne_Int_Int);
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntNE, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ne_Int_Float()
+        {
+            var par = GenHeader(BuiltIns.Ne_Int_Float);
+            var conv0 = LLVM.BuildSIToFP(builder, par[0], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealONE, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ne_Float_Int()
+        {
+            var par = GenHeader(BuiltIns.Ne_Float_Int);
+            var conv1 = LLVM.BuildSIToFP(builder, par[1], LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealONE, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ne_Float_Float()
+        {
+            var par = GenHeader(BuiltIns.Ne_Float_Float);
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealONE, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ne_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.Ne_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntNE, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ne_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.Ne_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntNE, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ne_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.Ne_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntNE, ext0, ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ne_Float_Bool()
+        {
+            var par = GenHeader(BuiltIns.Ne_Float_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var conv1 = LLVM.BuildSIToFP(builder, ext1, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealONE, par[0], conv1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Ne_Bool_Float()
+        {
+            var par = GenHeader(BuiltIns.Ne_Bool_Float);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var conv0 = LLVM.BuildSIToFP(builder, ext0, LLVM.FloatType(), "");
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealONE, conv0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __not__
+
+        void Gen_Not_Int()
+        {
+            var par = GenHeader(BuiltIns.Not_Int);
+            var zero = LLVM.ConstInt(LLVM.Int32Type(), 0, false);
+            var ne = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntNE, par[0], zero, "");
+            var tru = LLVM.ConstInt(LLVM.Int1Type(), 1, false);
+            var xor = LLVM.BuildXor(builder, ne, tru, "");
+            LLVM.BuildRet(builder, xor);
+        }
+
+        void Gen_Not_Float()
+        {
+            var par = GenHeader(BuiltIns.Not_Float);
+            var zero = LLVM.ConstReal(LLVM.FloatType(), 0.0);
+            var ne = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealUNE, par[0], zero, "");
+            var tru = LLVM.ConstInt(LLVM.Int1Type(), 1, false);
+            var xor = LLVM.BuildXor(builder, ne, tru, "");
+            LLVM.BuildRet(builder, xor);
+        }
+
+        void Gen_Not_Bool()
+        {
+            var par = GenHeader(BuiltIns.Not_Bool);
+            var tru = LLVM.ConstInt(LLVM.Int1Type(), 1, false);
+            var xor = LLVM.BuildXor(builder, par[0], tru, "");
+            LLVM.BuildRet(builder, xor);
         }
 
         #endregion

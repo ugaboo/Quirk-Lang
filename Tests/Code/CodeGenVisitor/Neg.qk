@@ -1,0 +1,4 @@
+﻿print(-2)
+print(-2.1)
+print(-True)
+print(-False)

@@ -269,6 +269,96 @@ namespace Quirk.Visitors
             pow.Funcs.Add(BuiltIns.Pow_Float_Bool);
             pow.Funcs.Add(BuiltIns.Pow_Bool_Float);
             table["__pow__"] = pow;
+
+            var pos = new Overload("__pos__");
+            pos.Funcs.Add(BuiltIns.Pos_Int);
+            pos.Funcs.Add(BuiltIns.Pos_Float);
+            pos.Funcs.Add(BuiltIns.Pos_Bool);
+            table["__pos__"] = pos;
+
+            var neg = new Overload("__neg__");
+            neg.Funcs.Add(BuiltIns.Neg_Int);
+            neg.Funcs.Add(BuiltIns.Neg_Float);
+            neg.Funcs.Add(BuiltIns.Neg_Bool);
+            table["__neg__"] = neg;
+
+            var lt = new Overload("__lt__");
+            lt.Funcs.Add(BuiltIns.Lt_Int_Int);
+            lt.Funcs.Add(BuiltIns.Lt_Int_Float);
+            lt.Funcs.Add(BuiltIns.Lt_Float_Int);
+            lt.Funcs.Add(BuiltIns.Lt_Float_Float);
+            lt.Funcs.Add(BuiltIns.Lt_Int_Bool);
+            lt.Funcs.Add(BuiltIns.Lt_Bool_Int);
+            lt.Funcs.Add(BuiltIns.Lt_Bool_Bool);
+            lt.Funcs.Add(BuiltIns.Lt_Float_Bool);
+            lt.Funcs.Add(BuiltIns.Lt_Bool_Float);
+            table["__lt__"] = lt;
+
+            var gt = new Overload("__gt__");
+            gt.Funcs.Add(BuiltIns.Gt_Int_Int);
+            gt.Funcs.Add(BuiltIns.Gt_Int_Float);
+            gt.Funcs.Add(BuiltIns.Gt_Float_Int);
+            gt.Funcs.Add(BuiltIns.Gt_Float_Float);
+            gt.Funcs.Add(BuiltIns.Gt_Int_Bool);
+            gt.Funcs.Add(BuiltIns.Gt_Bool_Int);
+            gt.Funcs.Add(BuiltIns.Gt_Bool_Bool);
+            gt.Funcs.Add(BuiltIns.Gt_Float_Bool);
+            gt.Funcs.Add(BuiltIns.Gt_Bool_Float);
+            table["__gt__"] = gt;
+
+            var le = new Overload("__le__");
+            le.Funcs.Add(BuiltIns.Le_Int_Int);
+            le.Funcs.Add(BuiltIns.Le_Int_Float);
+            le.Funcs.Add(BuiltIns.Le_Float_Int);
+            le.Funcs.Add(BuiltIns.Le_Float_Float);
+            le.Funcs.Add(BuiltIns.Le_Int_Bool);
+            le.Funcs.Add(BuiltIns.Le_Bool_Int);
+            le.Funcs.Add(BuiltIns.Le_Bool_Bool);
+            le.Funcs.Add(BuiltIns.Le_Float_Bool);
+            le.Funcs.Add(BuiltIns.Le_Bool_Float);
+            table["__le__"] = le;
+
+            var ge = new Overload("__ge__");
+            ge.Funcs.Add(BuiltIns.Ge_Int_Int);
+            ge.Funcs.Add(BuiltIns.Ge_Int_Float);
+            ge.Funcs.Add(BuiltIns.Ge_Float_Int);
+            ge.Funcs.Add(BuiltIns.Ge_Float_Float);
+            ge.Funcs.Add(BuiltIns.Ge_Int_Bool);
+            ge.Funcs.Add(BuiltIns.Ge_Bool_Int);
+            ge.Funcs.Add(BuiltIns.Ge_Bool_Bool);
+            ge.Funcs.Add(BuiltIns.Ge_Float_Bool);
+            ge.Funcs.Add(BuiltIns.Ge_Bool_Float);
+            table["__ge__"] = ge;
+
+            var eq = new Overload("__eq__");
+            eq.Funcs.Add(BuiltIns.Eq_Int_Int);
+            eq.Funcs.Add(BuiltIns.Eq_Int_Float);
+            eq.Funcs.Add(BuiltIns.Eq_Float_Int);
+            eq.Funcs.Add(BuiltIns.Eq_Float_Float);
+            eq.Funcs.Add(BuiltIns.Eq_Int_Bool);
+            eq.Funcs.Add(BuiltIns.Eq_Bool_Int);
+            eq.Funcs.Add(BuiltIns.Eq_Bool_Bool);
+            eq.Funcs.Add(BuiltIns.Eq_Float_Bool);
+            eq.Funcs.Add(BuiltIns.Eq_Bool_Float);
+            table["__eq__"] = eq;
+
+            var ne = new Overload("__ne__");
+            ne.Funcs.Add(BuiltIns.Ne_Int_Int);
+            ne.Funcs.Add(BuiltIns.Ne_Int_Float);
+            ne.Funcs.Add(BuiltIns.Ne_Float_Int);
+            ne.Funcs.Add(BuiltIns.Ne_Float_Float);
+            ne.Funcs.Add(BuiltIns.Ne_Int_Bool);
+            ne.Funcs.Add(BuiltIns.Ne_Bool_Int);
+            ne.Funcs.Add(BuiltIns.Ne_Bool_Bool);
+            ne.Funcs.Add(BuiltIns.Ne_Float_Bool);
+            ne.Funcs.Add(BuiltIns.Ne_Bool_Float);
+            table["__ne__"] = ne;
+
+            var not = new Overload("__not__");
+            not.Funcs.Add(BuiltIns.Not_Int);
+            not.Funcs.Add(BuiltIns.Not_Bool);
+            not.Funcs.Add(BuiltIns.Not_Float);
+            table["__not__"] = not;
         }
     }
 }
