@@ -1,0 +1,4 @@
+﻿print(5 | 6)
+print(3 | True)
+print(False | 3)
+print(True | True)

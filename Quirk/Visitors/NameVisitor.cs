@@ -153,6 +153,21 @@ namespace Quirk.Visitors
             }
         }
 
+        public void Visit(IfStmnt ifStmnt)
+        {
+            for (var i = 0; i < ifStmnt.IfThen.Count; i += 1) {
+                var tuple = ifStmnt.IfThen[i];
+                Replace(ref tuple.condition);
+                for (var j = 0; j < tuple.statements.Count; j += 1) {
+                    tuple.statements[j].Accept(this);
+                }
+                ifStmnt.IfThen[i] = tuple;
+            }
+            for (var i = 0; i < ifStmnt.ElseStatements.Count; i += 1) {
+                ifStmnt.ElseStatements[i].Accept(this);
+            }
+        }
+
         public void Visit(ReturnStmnt returnStmnt)
         {
             var vals = returnStmnt.Values;
@@ -359,6 +374,46 @@ namespace Quirk.Visitors
             not.Funcs.Add(BuiltIns.Not_Bool);
             not.Funcs.Add(BuiltIns.Not_Float);
             table["__not__"] = not;
+
+            var bitand = new Overload("__bitand__");
+            bitand.Funcs.Add(BuiltIns.BitAnd_Int_Int);
+            bitand.Funcs.Add(BuiltIns.BitAnd_Int_Bool);
+            bitand.Funcs.Add(BuiltIns.BitAnd_Bool_Int);
+            bitand.Funcs.Add(BuiltIns.BitAnd_Bool_Bool);
+            table["__bitand__"] = bitand;
+
+            var bitor = new Overload("__bitor__");
+            bitor.Funcs.Add(BuiltIns.BitOr_Int_Int);
+            bitor.Funcs.Add(BuiltIns.BitOr_Int_Bool);
+            bitor.Funcs.Add(BuiltIns.BitOr_Bool_Int);
+            bitor.Funcs.Add(BuiltIns.BitOr_Bool_Bool);
+            table["__bitor__"] = bitor;
+
+            var bitxor = new Overload("__bitxor__");
+            bitxor.Funcs.Add(BuiltIns.BitXor_Int_Int);
+            bitxor.Funcs.Add(BuiltIns.BitXor_Int_Bool);
+            bitxor.Funcs.Add(BuiltIns.BitXor_Bool_Int);
+            bitxor.Funcs.Add(BuiltIns.BitXor_Bool_Bool);
+            table["__bitxor__"] = bitxor;
+
+            var invert = new Overload("__invert__");
+            invert.Funcs.Add(BuiltIns.Invert_Int);
+            invert.Funcs.Add(BuiltIns.Invert_Bool);
+            table["__invert__"] = invert;
+
+            var lshift = new Overload("__lshift__");
+            lshift.Funcs.Add(BuiltIns.LShift_Int_Int);
+            lshift.Funcs.Add(BuiltIns.LShift_Int_Bool);
+            lshift.Funcs.Add(BuiltIns.LShift_Bool_Int);
+            lshift.Funcs.Add(BuiltIns.LShift_Bool_Bool);
+            table["__lshift__"] = lshift;
+
+            var rshift = new Overload("__rshift__");
+            rshift.Funcs.Add(BuiltIns.RShift_Int_Int);
+            rshift.Funcs.Add(BuiltIns.RShift_Int_Bool);
+            rshift.Funcs.Add(BuiltIns.RShift_Bool_Int);
+            rshift.Funcs.Add(BuiltIns.RShift_Bool_Bool);
+            table["__rshift__"] = rshift;
         }
     }
 }

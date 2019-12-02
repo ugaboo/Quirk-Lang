@@ -156,5 +156,33 @@ namespace Quirk.Helpers
         public static readonly Function Not_Int = new Function(Bool, "__not__", Int);
         public static readonly Function Not_Float = new Function(Bool, "__not__", Float);
         public static readonly Function Not_Bool = new Function(Bool, "__not__", Bool);
+
+        public static readonly Function BitAnd_Int_Int = new Function(Int, "__bitand__", Int, Int);
+        public static readonly Function BitAnd_Int_Bool = new Function(Int, "__bitand__", Int, Bool);
+        public static readonly Function BitAnd_Bool_Int = new Function(Int, "__bitand__", Bool, Int);
+        public static readonly Function BitAnd_Bool_Bool = new Function(Bool, "__bitand__", Bool, Bool);
+
+        public static readonly Function BitOr_Int_Int = new Function(Int, "__bitor__", Int, Int);
+        public static readonly Function BitOr_Int_Bool = new Function(Int, "__bitor__", Int, Bool);
+        public static readonly Function BitOr_Bool_Int = new Function(Int, "__bitor__", Bool, Int);
+        public static readonly Function BitOr_Bool_Bool = new Function(Bool, "__bitor__", Bool, Bool);
+
+        public static readonly Function BitXor_Int_Int = new Function(Int, "__bitxor__", Int, Int);
+        public static readonly Function BitXor_Int_Bool = new Function(Int, "__bitxor__", Int, Bool);
+        public static readonly Function BitXor_Bool_Int = new Function(Int, "__bitxor__", Bool, Int);
+        public static readonly Function BitXor_Bool_Bool = new Function(Bool, "__bitxor__", Bool, Bool);
+
+        public static readonly Function Invert_Int = new Function(Int, "__invert__", Int);
+        public static readonly Function Invert_Bool = new Function(Int, "__invert__", Bool);
+
+        public static readonly Function LShift_Int_Int = new Function(Int, "__lshift__", Int, Int);
+        public static readonly Function LShift_Int_Bool = new Function(Int, "__lshift__", Int, Bool);
+        public static readonly Function LShift_Bool_Int = new Function(Int, "__lshift__", Bool, Int);
+        public static readonly Function LShift_Bool_Bool = new Function(Int, "__lshift__", Bool, Bool);
+
+        public static readonly Function RShift_Int_Int = new Function(Int, "__rshift__", Int, Int);
+        public static readonly Function RShift_Int_Bool = new Function(Int, "__rshift__", Int, Bool);
+        public static readonly Function RShift_Bool_Int = new Function(Int, "__rshift__", Bool, Int);
+        public static readonly Function RShift_Bool_Bool = new Function(Int, "__rshift__", Bool, Bool);
     }
 }

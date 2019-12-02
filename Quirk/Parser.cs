@@ -700,11 +700,87 @@ namespace Quirk
 
         bool CompoundStmnt(List<AST.ProgObj> statements)
         {
+            if (IfStmnt(statements)) {
+                goto _end;
+            }
             if (FuncDef(statements)) {
                 goto _end;
             }
             return false;
         _end:
+            return true;
+        }
+
+        bool IfStmnt(List<AST.ProgObj> statements)
+        {
+            AST.IfStmnt stmnt;
+
+            if (scan.Lexeme == Lexeme.KwIf) {
+                stmnt = new AST.IfStmnt();
+
+                scan.Next();
+                goto _1;
+            }
+            return false;
+        _1:
+            if (Test(out var condition)) {
+                goto _2;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
+        _2:
+            if (scan.Lexeme == Lexeme.Colon) {
+                scan.Next();
+                goto _3;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
+        _3:
+            var inner = new List<AST.ProgObj>();
+            if (Suite(inner)) {
+                stmnt.IfThen.Add((condition, inner));
+                goto _4;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
+        _4:
+            if (scan.Lexeme == Lexeme.KwElif) {
+                scan.Next();
+                goto _5;
+            }
+            if (scan.Lexeme == Lexeme.KwElse) {
+                scan.Next();
+                goto _8;
+            }
+            goto _end;
+        _5:
+            if (Test(out condition)) {
+                goto _6;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
+        _6:
+            if (scan.Lexeme == Lexeme.Colon) {
+                scan.Next();
+                goto _7;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
+        _7:
+            inner = new List<AST.ProgObj>();
+            if (Suite(inner)) {
+                stmnt.IfThen.Add((condition, inner));
+                goto _4;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
+        _8:
+            if (scan.Lexeme == Lexeme.Colon) {
+                scan.Next();
+                goto _9;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
+        _9:
+            if (Suite(stmnt.ElseStatements)) {
+                goto _end;
+            }
+            throw new CompilationError(ErrorType.InvalidSyntax);
+        _end:
+            statements.Add(stmnt);
             return true;
         }
 

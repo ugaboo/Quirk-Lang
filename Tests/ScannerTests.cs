@@ -87,6 +87,12 @@ namespace Quirk.Tests
             scan.Next();
             Assert.AreEqual(KwTrue, scan.Lexeme);
             scan.Next();
+            Assert.AreEqual(KwIf, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(KwElif, scan.Lexeme);
+            scan.Next();
+            Assert.AreEqual(KwElse, scan.Lexeme);
+            scan.Next();
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 

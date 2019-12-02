@@ -1,0 +1,10 @@
+﻿def f(x):
+	if x > 0:
+		a = x
+	elif x < 0:
+		b = x
+	else:
+		c = x
+
+f(1)
+f(-2.0)

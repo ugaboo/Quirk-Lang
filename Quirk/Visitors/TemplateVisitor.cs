@@ -129,6 +129,30 @@ namespace Quirk.Visitors
             result.Push(clone);
         }
 
+        public void Visit(IfStmnt ifStmnt)
+        {
+            var clone = new IfStmnt();
+
+            foreach (var tuple in ifStmnt.IfThen) {
+                tuple.condition.Accept(this);
+                var condition = result.Pop();
+
+                var statements = new List<ProgObj>();
+                foreach (var stmnt in tuple.statements) {
+                    stmnt.Accept(this);
+                    statements.Add(result.Pop());
+                }
+
+                clone.IfThen.Add((condition, statements));
+            }
+            foreach (var stmnt in ifStmnt.ElseStatements) {
+                stmnt.Accept(this);
+                clone.ElseStatements.Add(result.Pop());
+            }
+
+            result.Push(clone);
+        }
+
         public void Visit(ReturnStmnt returnStmnt)
         {
             var clone = new ReturnStmnt();

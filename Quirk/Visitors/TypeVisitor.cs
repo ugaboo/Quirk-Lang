@@ -12,13 +12,22 @@ namespace Quirk.Visitors
         readonly Stack<Function> hierarchy = new Stack<Function>();
         readonly Stack<TypeObj> result = new Stack<TypeObj>();
 
+        bool ignoreErrors;
+        bool typeErrorFound;
+
 
         public TypeVisitor(Module module)
         {
             new NameVisitor(module);
+
+            ignoreErrors = true;
             module.Accept(this);
-            if (result.Count > 0) {
-                throw new InvalidOperationException();
+
+            if (result.Count > 0) { throw new InvalidOperationException(); }
+
+            if (typeErrorFound) {
+                ignoreErrors = false;
+                module.Accept(this);
             }
         }
 
@@ -72,7 +81,12 @@ namespace Quirk.Visitors
             assignment.Right.Accept(this);
             var type = result.Pop();
             if (type == null) {
-                throw new CompilationError(CantDetermineType);
+                if (ignoreErrors) {
+                    typeErrorFound = true;
+                    return;
+                } else {
+                    throw new CompilationError(CantDetermineType);
+                }
             }
             if (assignment.Left is Variable variable) {
                 if (variable.Type == null) {
@@ -93,15 +107,25 @@ namespace Quirk.Visitors
 
         public void Visit(FuncCall funcCall)
         {
-            if (funcCall.Func is Function) {
-                funcCall.Func.Accept(this);
+            if (funcCall.Func is Function cf) {
+                if (hierarchy.Contains(cf)) {
+                    result.Push(cf.RetType as TypeObj);
+                } else {
+                    funcCall.Func.Accept(this);
+                }
             } else if (funcCall.Func is Overload overload) {
                 var types = new List<TypeObj>();
                 foreach (var arg in funcCall.Args) {
                     arg.Accept(this);
                     var type = result.Pop();
                     if (type == null) {
-                        throw new CompilationError(CantDetermineType);
+                        if (ignoreErrors) {
+                            typeErrorFound = true;
+                            result.Push(null);
+                            return;
+                        } else {
+                            throw new CompilationError(CantDetermineType);
+                        }
                     }
                     types.Add(type);
                 }
@@ -116,14 +140,35 @@ namespace Quirk.Visitors
                         for (var i = 0; i < types.Count; i += 1) {
                             spec.Parameters[i].Type = types[i];
                         }
+                        specFuncs.Add(func, spec);
+                        spec.Accept(this);
+                        result.Pop();
                     }
                     funcCall.Func = spec;
+                    result.Push((TypeObj)spec.RetType);
                 } else {
                     funcCall.Func = func;
+                    result.Push((TypeObj)func.RetType);
                 }
-                funcCall.Func.Accept(this);
             } else {
                 throw new CompilationError(ObjectIsNotCallable);
+            }
+        }
+
+        public void Visit(IfStmnt ifStmnt)
+        {
+            foreach (var (condition, statments) in ifStmnt.IfThen) {
+                condition.Accept(this);
+                var type = result.Pop();
+                if (type != BuiltIns.Bool) {
+                    throw new Exception("Not implemented");
+                }
+                foreach (var stmnt in statments) {
+                    stmnt.Accept(this);
+                }
+            }
+            foreach (var stmnt in ifStmnt.ElseStatements) {
+                stmnt.Accept(this);
             }
         }
 

@@ -1,0 +1,8 @@
+﻿x = 0
+
+if x:
+	y = x
+elif x:
+	y = x
+else:
+	y = x

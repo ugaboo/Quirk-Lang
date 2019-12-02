@@ -1,0 +1,10 @@
+﻿a = True
+b = 1
+c = 1.0
+
+if a:
+	x = a
+elif b > 1:
+	y = b
+else:
+	z = c

@@ -7,10 +7,18 @@ namespace Quirk.Visitors
 {
     public partial class CodeGenVisitor : AST.IVisitor
     {
+        BuiltInsLLVM builtIns;
+
         LLVMBuilderRef builder = LLVM.CreateBuilder();
+
+        LLVMModuleRef moduleLLVM;
+        LLVMValueRef mainFuncLLVM;
+
         Stack<LLVMValueRef> values = new Stack<LLVMValueRef>();
         Stack<LLVMTypeRef> types = new Stack<LLVMTypeRef>();
-        Stack<LLVMBasicBlockRef> blocks = new Stack<LLVMBasicBlockRef>();
+
+        Stack<LLVMBasicBlockRef> varBlocks = new Stack<LLVMBasicBlockRef>();
+        Stack<LLVMBasicBlockRef> codeBlocks = new Stack<LLVMBasicBlockRef>();
 
         Dictionary<AST.Function, LLVMValueRef> llvmFuncs = new Dictionary<AST.Function, LLVMValueRef>();
         Dictionary<AST.Variable, LLVMValueRef> llvmVars = new Dictionary<AST.Variable, LLVMValueRef>();
@@ -18,10 +26,7 @@ namespace Quirk.Visitors
 
         readonly Stack<AST.Function> hierarchy = new Stack<AST.Function>();
 
-        LLVMModuleRef moduleLLVM;
-        LLVMValueRef dstr;
 
-        BuiltInsLLVM builtIns;
                
 
         public CodeGenVisitor(AST.Module module)
@@ -36,17 +41,31 @@ namespace Quirk.Visitors
 
             builtIns = new BuiltInsLLVM(builder, moduleLLVM);
 
-            var mainFunc = LLVM.AddFunction(moduleLLVM, "main", LLVM.FunctionType(LLVM.Int32Type(), new LLVMTypeRef[] { }, false));
+            mainFuncLLVM = LLVM.AddFunction(moduleLLVM, "main", LLVM.FunctionType(LLVM.Int32Type(), new LLVMTypeRef[] { }, false));
 
-            var block = LLVM.AppendBasicBlock(mainFunc, "entry");
-            blocks.Push(block);
+            var varBlock = LLVM.AppendBasicBlock(mainFuncLLVM, "var");
+            var codeBlock = LLVM.AppendBasicBlock(mainFuncLLVM, "begin");
+            varBlocks.Push(varBlock);
+            codeBlocks.Push(codeBlock);
+
+            var buildRet = true;
             foreach (var statement in module.Statements) {
                 statement.Accept(this);
+                if (statement is AST.ReturnStmnt) {
+                    buildRet = false;
+                    break;
+                }
             }
-            blocks.Pop();
+            LLVM.PositionBuilderAtEnd(builder, varBlock);
+            LLVM.BuildBr(builder, codeBlock);
 
-            LLVM.PositionBuilderAtEnd(builder, block);
-            LLVM.BuildRet(builder, LLVM.ConstInt(LLVM.Int32Type(), 0, false));
+            if (buildRet) {
+                LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
+                LLVM.BuildRet(builder, LLVM.ConstInt(LLVM.Int32Type(), 0, false));
+            }
+
+            codeBlocks.Pop();
+            varBlocks.Pop();
 
             LLVM.WriteBitcodeToFile(moduleLLVM, $"{module.Name}.bc");
             LLVM.PrintModuleToFile(moduleLLVM, $"{module.Name}.ll", out var errorMsg);
@@ -75,15 +94,27 @@ namespace Quirk.Visitors
                     LLVM.SetValueName(param, func.Parameters[i].Name);
                 }
 
-                var block = LLVM.AppendBasicBlock(funcLLVM, "entry");
-                blocks.Push(block);
+                var varBlock = LLVM.AppendBasicBlock(funcLLVM, "var");
+                var codeBlock = LLVM.AppendBasicBlock(funcLLVM, "begin");
+                varBlocks.Push(varBlock);
+                codeBlocks.Push(codeBlock);
+
+                var buildRet = true;
                 foreach (var statement in func.Statements) {
                     statement.Accept(this);
+                    if (statement is AST.ReturnStmnt) {
+                        buildRet = false;
+                        break;
+                    }
                 }
-                if (func.RetType == null) {
+                if (func.RetType == null && buildRet) {
+                    LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
                     LLVM.BuildRetVoid(builder);
                 }
-                blocks.Pop();
+                LLVM.PositionBuilderAtEnd(builder, varBlock);
+                LLVM.BuildBr(builder, codeBlock);
+                codeBlocks.Pop();
+                varBlocks.Pop();
 
                 values.Push(funcLLVM);
             }
@@ -93,7 +124,7 @@ namespace Quirk.Visitors
 
         public void Visit(AST.Variable variable)
         {
-            LLVM.PositionBuilderAtEnd(builder, blocks.Peek());
+            LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
             values.Push(LLVM.BuildLoad(builder, llvmVars[variable], ""));
 
             //var variableLLVM = LLVM.AddGlobal(moduleLLVM, LLVM.Int32Type(), variable.Name);
@@ -123,7 +154,7 @@ namespace Quirk.Visitors
                 if (llvmVars.TryGetValue(variable, out var variableLLVM) == false) {
                     variable.Type.Accept(this);
                     var typeLLVM = types.Pop();
-                    LLVM.PositionBuilderAtEnd(builder, blocks.Peek());
+                    LLVM.PositionBuilderAtEnd(builder, varBlocks.Peek());
                     variableLLVM = LLVM.BuildAlloca(builder, typeLLVM, variable.Name);
                     llvmVars[variable] = variableLLVM;
                 }
@@ -155,9 +186,49 @@ namespace Quirk.Visitors
                 args[i] = values.Pop();
             }
 
-            LLVM.PositionBuilderAtEnd(builder, blocks.Peek());
+            LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
             var funcCallLLVM = LLVM.BuildCall(builder, funcLLVM, args, "");
             values.Push(funcCallLLVM);
+        }
+
+        public void Visit(AST.IfStmnt ifStmnt)
+        {
+            var funcLLVM = hierarchy.Count > 0 ? llvmFuncs[hierarchy.Peek()] : mainFuncLLVM;
+
+            var thenBlock = LLVM.AppendBasicBlock(funcLLVM, "if_then");
+            var elseBlock = LLVM.AppendBasicBlock(funcLLVM, "else");
+            var endBlock = LLVM.AppendBasicBlock(funcLLVM, "end_if");
+
+            LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
+            ifStmnt.IfThen[0].condition.Accept(this);
+            LLVM.BuildCondBr(builder, values.Pop(), thenBlock, elseBlock);
+
+            codeBlocks.Pop();
+            codeBlocks.Push(thenBlock);
+
+            var buildBr = true;
+            foreach (var stmnt in ifStmnt.IfThen[0].statements) {
+                stmnt.Accept(this);
+                if (stmnt is AST.ReturnStmnt) {
+                    buildBr = false;
+                    break;
+                }
+            }
+            if (buildBr) {
+                LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
+                LLVM.BuildBr(builder, endBlock);
+            }
+
+            codeBlocks.Pop();
+            codeBlocks.Push(elseBlock);
+
+
+
+            LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
+            LLVM.BuildBr(builder, endBlock);
+
+            codeBlocks.Pop();
+            codeBlocks.Push(endBlock);
         }
 
         public void Visit(AST.ReturnStmnt returnStmnt)
@@ -168,7 +239,7 @@ namespace Quirk.Visitors
                 vals.Add(values.Pop());
             }
 
-            LLVM.PositionBuilderAtEnd(builder, blocks.Peek());
+            LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
             if (vals.Count == 0) {
                 values.Push(LLVM.BuildRetVoid(builder));
             } else {

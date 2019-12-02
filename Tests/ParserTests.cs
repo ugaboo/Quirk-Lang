@@ -535,5 +535,39 @@ namespace Quirk.Tests
             Assert.AreEqual(2, ((AST.ConstInt)ret3.Values[1]).Value);
             Assert.AreEqual(true, ((AST.ConstBool)ret3.Values[2]).Value);
         }
+
+        [TestMethod()]
+        public void If()
+        {
+            new Parser("Code/Parser/If.qk", "If", out var module);
+            //Assert.AreEqual(3, module.Statements.Count);
+
+            var if0 = (AST.IfStmnt)module.Statements[0];
+            Assert.AreEqual(1, if0.IfThen.Count);
+            Assert.AreEqual("x", ((AST.NameObj)if0.IfThen[0].condition).Name);
+            Assert.AreEqual(0, if0.IfThen[0].statements.Count);
+
+            var if1 = (AST.IfStmnt)module.Statements[1];
+            Assert.AreEqual(2, if1.IfThen.Count);
+            Assert.AreEqual("x", ((AST.NameObj)if1.IfThen[0].condition).Name);
+            Assert.AreEqual(1, if1.IfThen[0].statements.Count);
+            Assert.AreEqual("y", ((AST.NameObj)if1.IfThen[1].condition).Name);
+            Assert.AreEqual(1, if1.IfThen[1].statements.Count);
+
+            var if2 = (AST.IfStmnt)module.Statements[2];
+            Assert.AreEqual(3, if2.IfThen.Count);
+            Assert.AreEqual("x", ((AST.NameObj)if2.IfThen[0].condition).Name);
+            Assert.AreEqual(0, if2.IfThen[0].statements.Count);
+            Assert.AreEqual("y", ((AST.NameObj)if2.IfThen[1].condition).Name);
+            Assert.AreEqual(0, if2.IfThen[1].statements.Count);
+            Assert.AreEqual("z", ((AST.NameObj)if2.IfThen[2].condition).Name);
+            Assert.AreEqual(0, if2.IfThen[1].statements.Count);
+            Assert.AreEqual(1, if2.ElseStatements.Count);
+
+            var if3 = (AST.IfStmnt)module.Statements[3];
+            Assert.AreEqual(1, if3.IfThen.Count);
+            Assert.AreEqual("x", ((AST.NameObj)if3.IfThen[0].condition).Name);
+            Assert.AreEqual(0, if3.ElseStatements.Count);
+        }
     }
 }

@@ -138,5 +138,68 @@ namespace Quirk.Tests
             new Parser("Code/CodeGenVisitor/Not.qk", "Not", out var module);
             new Visitors.CodeGenVisitor(module);
         }
+
+        [TestMethod()]
+        public void BitAnd()
+        {
+            new Parser("Code/CodeGenVisitor/BitAnd.qk", "BitAnd", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void BitOr()
+        {
+            new Parser("Code/CodeGenVisitor/BitOr.qk", "BitOr", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void BitXor()
+        {
+            new Parser("Code/CodeGenVisitor/BitXor.qk", "BitXor", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Invert()
+        {
+            new Parser("Code/CodeGenVisitor/Invert.qk", "Invert", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void LShift()
+        {
+            new Parser("Code/CodeGenVisitor/LShift.qk", "LShift", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void RShift()
+        {
+            new Parser("Code/CodeGenVisitor/RShift.qk", "RShift", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void If1()
+        {
+            new Parser("Code/CodeGenVisitor/If1.qk", "If1", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Factorial()
+        {
+            new Parser("Code/CodeGenVisitor/Factorial.qk", "Factorial", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Factorial2()
+        {
+            new Parser("Code/CodeGenVisitor/Factorial2.qk", "Factorial2", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
     }
 }

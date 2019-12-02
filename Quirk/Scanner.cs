@@ -15,6 +15,9 @@ namespace Quirk
             { "return", Lexeme.KwReturn },
             { "True", Lexeme.KwTrue },
             { "False", Lexeme.KwFalse },
+            { "if", Lexeme.KwIf },
+            { "elif", Lexeme.KwElif },
+            { "else", Lexeme.KwElse },
         };
 
         Reader reader;

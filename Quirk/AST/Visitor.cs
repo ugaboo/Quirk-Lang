@@ -12,6 +12,7 @@
         void Visit(Assignment assignment);
         void Visit(Evaluation evaluation);
         void Visit(FuncCall funcCall);
+        void Visit(IfStmnt ifStmnt);
         void Visit(ReturnStmnt returnStmnt);
         void Visit(NameObj namedObj);
         void Visit(ConstInt constInt);

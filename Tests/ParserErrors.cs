@@ -42,5 +42,13 @@ namespace Quirk.Tests
         [TestMethod()] public void Parameters() { Test("Parameters"); }
         [TestMethod()] public void TypedFormalParamDef() { Test("TypedFormalParamDef"); }
         [TestMethod()] public void Suite() { Test("Suite", ErrorType.ExpectedAnIndentedBlock); }
+        [TestMethod()] public void If1() { Test("If1"); }
+        [TestMethod()] public void If2() { Test("If2"); }
+        [TestMethod()] public void If3() { Test("If3"); }
+        [TestMethod()] public void If4() { Test("If4"); }
+        [TestMethod()] public void If5() { Test("If5"); }
+        [TestMethod()] public void If6() { Test("If6"); }
+        [TestMethod()] public void If7() { Test("If7"); }
+        [TestMethod()] public void If8() { Test("If8"); }
     }
 }

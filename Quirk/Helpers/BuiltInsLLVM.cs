@@ -236,6 +236,58 @@ namespace Quirk.Helpers
             Gen_Not_Bool();
 
             #endregion
+
+            #region __bitand__
+
+            Gen_BitAnd_Int_Int();
+            Gen_BitAnd_Int_Bool();
+            Gen_BitAnd_Bool_Int();
+            Gen_BitAnd_Bool_Bool();
+
+            #endregion
+
+            #region __bitor__
+
+            Gen_BitOr_Int_Int();
+            Gen_BitOr_Int_Bool();
+            Gen_BitOr_Bool_Int();
+            Gen_BitOr_Bool_Bool();
+
+            #endregion
+
+            #region __bitxor__
+
+            Gen_BitXor_Int_Int();
+            Gen_BitXor_Int_Bool();
+            Gen_BitXor_Bool_Int();
+            Gen_BitXor_Bool_Bool();
+
+            #endregion
+
+            #region __invert__
+
+            Gen_Invert_Int();
+            Gen_Invert_Bool();
+
+            #endregion
+
+            #region __lshift__
+
+            Gen_LShift_Int_Int();
+            Gen_LShift_Int_Bool();
+            Gen_LShift_Bool_Int();
+            Gen_LShift_Bool_Bool();
+
+            #endregion
+
+            #region __rshift__
+
+            Gen_RShift_Int_Int();
+            Gen_RShift_Int_Bool();
+            Gen_RShift_Bool_Int();
+            Gen_RShift_Bool_Bool();
+
+            #endregion
         }
 
         public LLVMValueRef Find(ProgObj obj)
@@ -266,7 +318,7 @@ namespace Quirk.Helpers
                 par[i] = param;
             }
 
-            var block = LLVM.AppendBasicBlock(func, "entry");
+            var block = LLVM.AppendBasicBlock(func, "begin");
             LLVM.PositionBuilderAtEnd(builder, block);
 
             lib[f] = func;
@@ -1430,6 +1482,213 @@ namespace Quirk.Helpers
             var tru = LLVM.ConstInt(LLVM.Int1Type(), 1, false);
             var xor = LLVM.BuildXor(builder, par[0], tru, "");
             LLVM.BuildRet(builder, xor);
+        }
+
+        #endregion
+
+        #region __bitand__
+
+        void Gen_BitAnd_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.BitAnd_Int_Int);
+            var op = LLVM.BuildAnd(builder, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_BitAnd_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.BitAnd_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildAnd(builder, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_BitAnd_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.BitAnd_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildAnd(builder, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_BitAnd_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.BitAnd_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildAnd(builder, ext0, ext1, "");
+            var zero = LLVM.ConstInt(LLVM.Int32Type(), 0, false);
+            var cmp = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntNE, op, zero, "");
+            LLVM.BuildRet(builder, cmp);
+        }
+
+        #endregion
+
+        #region __bitor__
+
+        void Gen_BitOr_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.BitOr_Int_Int);
+            var op = LLVM.BuildOr(builder, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_BitOr_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.BitOr_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildOr(builder, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_BitOr_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.BitOr_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildOr(builder, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_BitOr_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.BitOr_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildOr(builder, ext0, ext1, "");
+            var zero = LLVM.ConstInt(LLVM.Int32Type(), 0, false);
+            var cmp = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntNE, op, zero, "");
+            LLVM.BuildRet(builder, cmp);
+        }
+
+        #endregion
+
+        #region __bitxor__
+
+        void Gen_BitXor_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.BitXor_Int_Int);
+            var op = LLVM.BuildXor(builder, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_BitXor_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.BitXor_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildXor(builder, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_BitXor_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.BitXor_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildXor(builder, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_BitXor_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.BitXor_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildXor(builder, ext0, ext1, "");
+            var zero = LLVM.ConstInt(LLVM.Int32Type(), 0, false);
+            var cmp = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntNE, op, zero, "");
+            LLVM.BuildRet(builder, cmp);
+        }
+
+        #endregion
+
+        #region __not__
+
+        void Gen_Invert_Int()
+        {
+            var par = GenHeader(BuiltIns.Invert_Int);
+            var minus1 = LLVM.ConstNeg(LLVM.ConstInt(LLVM.Int32Type(), 1, false));
+            var op = LLVM.BuildXor(builder, par[0], minus1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Invert_Bool()
+        {
+            var par = GenHeader(BuiltIns.Invert_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var minus1 = LLVM.ConstNeg(LLVM.ConstInt(LLVM.Int32Type(), 1, false));
+            var op = LLVM.BuildXor(builder, ext0, minus1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __lshift__
+
+        void Gen_LShift_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.LShift_Int_Int);
+            var op = LLVM.BuildShl(builder, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_LShift_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.LShift_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildShl(builder, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_LShift_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.LShift_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildShl(builder, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_LShift_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.LShift_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildShl(builder, ext0, ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
+
+        #region __rshift__
+
+        void Gen_RShift_Int_Int()
+        {
+            var par = GenHeader(BuiltIns.RShift_Int_Int);
+            var op = LLVM.BuildAShr(builder, par[0], par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_RShift_Int_Bool()
+        {
+            var par = GenHeader(BuiltIns.RShift_Int_Bool);
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildAShr(builder, par[0], ext1, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_RShift_Bool_Int()
+        {
+            var par = GenHeader(BuiltIns.RShift_Bool_Int);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var op = LLVM.BuildAShr(builder, ext0, par[1], "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_RShift_Bool_Bool()
+        {
+            var par = GenHeader(BuiltIns.RShift_Bool_Bool);
+            var ext0 = LLVM.BuildZExt(builder, par[0], LLVM.Int32Type(), "");
+            var ext1 = LLVM.BuildZExt(builder, par[1], LLVM.Int32Type(), "");
+            var op = LLVM.BuildAShr(builder, ext0, ext1, "");
+            LLVM.BuildRet(builder, op);
         }
 
         #endregion

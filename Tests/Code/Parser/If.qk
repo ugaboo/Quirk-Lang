@@ -1,0 +1,18 @@
+﻿if x: pass
+
+if x:
+	x = 1
+elif y:
+	y = 2
+
+if x:
+	pass
+elif y:
+	pass
+elif z:
+	pass
+else:
+	x = 0
+
+if x: pass
+else: pass

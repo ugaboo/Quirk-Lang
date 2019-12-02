@@ -1,0 +1,4 @@
+﻿print(2 >> 1)
+print(3 >> True)
+print(True >> 1)
+print(True >> True)
