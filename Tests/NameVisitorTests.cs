@@ -181,17 +181,19 @@ namespace Quirk.Tests
             var x = (AST.Variable)assign.Left;
 
             var ifStmnt = (AST.IfStmnt)module.Statements[1];
-            Assert.AreEqual(2, ifStmnt.IfThen.Count);
+            Assert.AreEqual(x, ifStmnt.Condition);
 
-            Assert.AreEqual(x, ifStmnt.IfThen[0].condition);
-
-            Assert.AreEqual(1, ifStmnt.IfThen[0].statements.Count);
-            var assign0 = (AST.Assignment)ifStmnt.IfThen[0].statements[0];
+            var assign0 = (AST.Assignment)ifStmnt.Then[0];
             Assert.AreEqual(x, assign0.Right);
 
-            Assert.AreEqual(x, ifStmnt.IfThen[1].condition);
-            var assign1 = (AST.Assignment)ifStmnt.IfThen[1].statements[0];
+            var elif = (AST.IfStmnt)ifStmnt.Else[0];
+            Assert.AreEqual(x, elif.Condition);
+
+            var assign1 = (AST.Assignment)elif.Then[0];
             Assert.AreEqual(x, assign1.Right);
+
+            var assign2 = (AST.Assignment)elif.Else[0];
+            Assert.AreEqual(x, assign2.Right);
         }
 
         [TestMethod()]

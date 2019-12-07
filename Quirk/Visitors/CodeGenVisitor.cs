@@ -16,6 +16,7 @@ namespace Quirk.Visitors
 
         Stack<LLVMValueRef> values = new Stack<LLVMValueRef>();
         Stack<LLVMTypeRef> types = new Stack<LLVMTypeRef>();
+        bool returns;
 
         Stack<LLVMBasicBlockRef> varBlocks = new Stack<LLVMBasicBlockRef>();
         Stack<LLVMBasicBlockRef> codeBlocks = new Stack<LLVMBasicBlockRef>();
@@ -48,18 +49,16 @@ namespace Quirk.Visitors
             varBlocks.Push(varBlock);
             codeBlocks.Push(codeBlock);
 
-            var buildRet = true;
             foreach (var statement in module.Statements) {
                 statement.Accept(this);
-                if (statement is AST.ReturnStmnt) {
-                    buildRet = false;
+                if (returns) {
                     break;
                 }
             }
             LLVM.PositionBuilderAtEnd(builder, varBlock);
             LLVM.BuildBr(builder, codeBlock);
 
-            if (buildRet) {
+            if (!returns) {
                 LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
                 LLVM.BuildRet(builder, LLVM.ConstInt(LLVM.Int32Type(), 0, false));
             }
@@ -82,7 +81,7 @@ namespace Quirk.Visitors
             if (llvmFuncs.TryGetValue(func, out var funcLLVM)) {
                 values.Push(funcLLVM);
             } else {
-                var name = DetermineName(func);
+                var name = DetermineName();
                 var retType = func.RetType != null ? ((AST.TypeObj)func.RetType).ToLLVM() : LLVM.VoidType();
                 var paramTypes = GetTypes(func.Parameters);
                 llvmFuncs[func] = funcLLVM = LLVM.AddFunction(moduleLLVM, name, LLVM.FunctionType(retType, paramTypes, false));
@@ -99,15 +98,13 @@ namespace Quirk.Visitors
                 varBlocks.Push(varBlock);
                 codeBlocks.Push(codeBlock);
 
-                var buildRet = true;
                 foreach (var statement in func.Statements) {
                     statement.Accept(this);
-                    if (statement is AST.ReturnStmnt) {
-                        buildRet = false;
+                    if (returns) {
                         break;
                     }
                 }
-                if (func.RetType == null && buildRet) {
+                if (func.RetType == null && !returns) {
                     LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
                     LLVM.BuildRetVoid(builder);
                 }
@@ -145,6 +142,7 @@ namespace Quirk.Visitors
             if (funcDef.Func.TemplateParamsCount == 0) {
                 funcDef.Func.Accept(this);
             }
+            returns = false;
         }
 
         public void Visit(AST.Assignment assignment)
@@ -166,13 +164,18 @@ namespace Quirk.Visitors
             assignment.Right.Accept(this);
             var right = values.Pop();
 
+            LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
             values.Push(LLVM.BuildStore(builder, right, left));
+
+            returns = false;
         }
 
         public void Visit(AST.Evaluation evaluation)
         {
             evaluation.Expr.Accept(this);
             values.Pop();
+
+            returns = false;
         }
 
         public void Visit(AST.FuncCall funcCall)
@@ -195,40 +198,53 @@ namespace Quirk.Visitors
         {
             var funcLLVM = hierarchy.Count > 0 ? llvmFuncs[hierarchy.Peek()] : mainFuncLLVM;
 
-            var thenBlock = LLVM.AppendBasicBlock(funcLLVM, "if_then");
+            var thenBlock = LLVM.AppendBasicBlock(funcLLVM, "then");
             var elseBlock = LLVM.AppendBasicBlock(funcLLVM, "else");
-            var endBlock = LLVM.AppendBasicBlock(funcLLVM, "end_if");
 
             LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
-            ifStmnt.IfThen[0].condition.Accept(this);
+            ifStmnt.Condition.Accept(this);
             LLVM.BuildCondBr(builder, values.Pop(), thenBlock, elseBlock);
 
             codeBlocks.Pop();
             codeBlocks.Push(thenBlock);
 
-            var buildBr = true;
-            foreach (var stmnt in ifStmnt.IfThen[0].statements) {
+            var thenReturns = false;
+            foreach (var stmnt in ifStmnt.Then) {
                 stmnt.Accept(this);
-                if (stmnt is AST.ReturnStmnt) {
-                    buildBr = false;
+                if (returns) {
+                    thenReturns = true;
                     break;
                 }
-            }
-            if (buildBr) {
-                LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
-                LLVM.BuildBr(builder, endBlock);
             }
 
             codeBlocks.Pop();
             codeBlocks.Push(elseBlock);
 
+            var elseReturns = false;
+            foreach (var stmnt in ifStmnt.Else) {
+                stmnt.Accept(this);
+                if (returns) {
+                    elseReturns = true;
+                    break;
+                }
+            }
 
+            if (thenReturns == false || elseReturns == false) {
+                var endBlock = LLVM.AppendBasicBlock(funcLLVM, "end");
 
-            LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
-            LLVM.BuildBr(builder, endBlock);
+                if (!thenReturns) {
+                    LLVM.PositionBuilderAtEnd(builder, thenBlock);
+                    LLVM.BuildBr(builder, endBlock);
+                }
+                if (!elseReturns) {
+                    LLVM.PositionBuilderAtEnd(builder, elseBlock);
+                    LLVM.BuildBr(builder, endBlock);
+                }
+                codeBlocks.Pop();
+                codeBlocks.Push(endBlock);
+            }
 
-            codeBlocks.Pop();
-            codeBlocks.Push(endBlock);
+            returns = thenReturns && elseReturns;
         }
 
         public void Visit(AST.ReturnStmnt returnStmnt)
@@ -245,6 +261,8 @@ namespace Quirk.Visitors
             } else {
                 values.Push(LLVM.BuildRet(builder, vals[0]));
             }
+
+            returns = true;
         }
 
         public void Visit(AST.NameObj nameObj) { throw new InvalidOperationException(); }
@@ -269,7 +287,7 @@ namespace Quirk.Visitors
             types.Push(typeObj.ToLLVM());
         }
 
-        string DetermineName(AST.ProgObj obj)
+        string DetermineName()
         {
             var name = "";
             foreach (var func in hierarchy) {

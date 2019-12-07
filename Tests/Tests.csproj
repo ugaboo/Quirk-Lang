@@ -25,10 +25,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Code\CodeGenVisitor\Fibonacci.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Code\CodeGenVisitor\Factorial2.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Code\CodeGenVisitor\Factorial.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\CodeGenVisitor\If1.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\CodeGenVisitor\If3.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Code\CodeGenVisitor\RShift.qk">
@@ -100,7 +109,7 @@
     <None Update="Code\CodeGenVisitor\Sub.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Code\CodeGenVisitor\If1.qk">
+    <None Update="Code\CodeGenVisitor\If2.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Code\CodeGenVisitor\Variables.qk">

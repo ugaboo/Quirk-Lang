@@ -713,17 +713,17 @@ namespace Quirk
 
         bool IfStmnt(List<AST.ProgObj> statements)
         {
-            AST.IfStmnt stmnt;
+            AST.IfStmnt result, ifStmnt;
 
             if (scan.Lexeme == Lexeme.KwIf) {
-                stmnt = new AST.IfStmnt();
+                result = ifStmnt = new AST.IfStmnt();
 
                 scan.Next();
                 goto _1;
             }
             return false;
         _1:
-            if (Test(out var condition)) {
+            if (Test(out ifStmnt.Condition)) {
                 goto _2;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -734,14 +734,16 @@ namespace Quirk
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _3:
-            var inner = new List<AST.ProgObj>();
-            if (Suite(inner)) {
-                stmnt.IfThen.Add((condition, inner));
+            if (Suite(ifStmnt.Then)) {
                 goto _4;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _4:
             if (scan.Lexeme == Lexeme.KwElif) {
+                var elif = new AST.IfStmnt();
+                ifStmnt.Else.Add(elif);
+                ifStmnt = elif;
+
                 scan.Next();
                 goto _5;
             }
@@ -751,7 +753,7 @@ namespace Quirk
             }
             goto _end;
         _5:
-            if (Test(out condition)) {
+            if (Test(out ifStmnt.Condition)) {
                 goto _6;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -762,9 +764,7 @@ namespace Quirk
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _7:
-            inner = new List<AST.ProgObj>();
-            if (Suite(inner)) {
-                stmnt.IfThen.Add((condition, inner));
+            if (Suite(ifStmnt.Then)) {
                 goto _4;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
@@ -775,12 +775,12 @@ namespace Quirk
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _9:
-            if (Suite(stmnt.ElseStatements)) {
+            if (Suite(ifStmnt.Else)) {
                 goto _end;
             }
             throw new CompilationError(ErrorType.InvalidSyntax);
         _end:
-            statements.Add(stmnt);
+            statements.Add(result);
             return true;
         }
 

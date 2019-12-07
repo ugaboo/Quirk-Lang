@@ -133,21 +133,16 @@ namespace Quirk.Visitors
         {
             var clone = new IfStmnt();
 
-            foreach (var tuple in ifStmnt.IfThen) {
-                tuple.condition.Accept(this);
-                var condition = result.Pop();
+            ifStmnt.Condition.Accept(this);
+            clone.Condition = result.Pop();
 
-                var statements = new List<ProgObj>();
-                foreach (var stmnt in tuple.statements) {
-                    stmnt.Accept(this);
-                    statements.Add(result.Pop());
-                }
-
-                clone.IfThen.Add((condition, statements));
-            }
-            foreach (var stmnt in ifStmnt.ElseStatements) {
+            foreach (var stmnt in ifStmnt.Then) {
                 stmnt.Accept(this);
-                clone.ElseStatements.Add(result.Pop());
+                clone.Then.Add(result.Pop());
+            }
+            foreach (var stmnt in ifStmnt.Else) {
+                stmnt.Accept(this);
+                clone.Else.Add(result.Pop());
             }
 
             result.Push(clone);

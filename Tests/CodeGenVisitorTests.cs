@@ -182,13 +182,6 @@ namespace Quirk.Tests
         }
 
         [TestMethod()]
-        public void If1()
-        {
-            new Parser("Code/CodeGenVisitor/If1.qk", "If1", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
         public void Factorial()
         {
             new Parser("Code/CodeGenVisitor/Factorial.qk", "Factorial", out var module);
@@ -199,6 +192,34 @@ namespace Quirk.Tests
         public void Factorial2()
         {
             new Parser("Code/CodeGenVisitor/Factorial2.qk", "Factorial2", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void If1()
+        {
+            new Parser("Code/CodeGenVisitor/If1.qk", "If1", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void If2()
+        {
+            new Parser("Code/CodeGenVisitor/If2.qk", "If2", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void If3()
+        {
+            new Parser("Code/CodeGenVisitor/If3.qk", "If3", out var module);
+            new Visitors.CodeGenVisitor(module);
+        }
+
+        [TestMethod()]
+        public void Fibonacci()
+        {
+            new Parser("Code/CodeGenVisitor/Fibonacci.qk", "Fibonacci", out var module);
             new Visitors.CodeGenVisitor(module);
         }
     }

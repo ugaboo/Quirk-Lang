@@ -4,8 +4,10 @@ namespace Quirk.AST
 {
     public class IfStmnt : ProgObj
     {
-        public readonly List<(ProgObj condition, List<ProgObj> statements)> IfThen = new List<(ProgObj, List<ProgObj>)>();
-        public readonly List<ProgObj> ElseStatements = new List<ProgObj>();
+        public ProgObj Condition;
+
+        public readonly List<ProgObj> Then = new List<ProgObj>();
+        public readonly List<ProgObj> Else = new List<ProgObj>();
 
         public IfStmnt() { }
 

@@ -155,16 +155,13 @@ namespace Quirk.Visitors
 
         public void Visit(IfStmnt ifStmnt)
         {
-            for (var i = 0; i < ifStmnt.IfThen.Count; i += 1) {
-                var tuple = ifStmnt.IfThen[i];
-                Replace(ref tuple.condition);
-                for (var j = 0; j < tuple.statements.Count; j += 1) {
-                    tuple.statements[j].Accept(this);
-                }
-                ifStmnt.IfThen[i] = tuple;
+            Replace(ref ifStmnt.Condition);
+
+            for (var i = 0; i < ifStmnt.Then.Count; i += 1) {
+                ifStmnt.Then[i].Accept(this);
             }
-            for (var i = 0; i < ifStmnt.ElseStatements.Count; i += 1) {
-                ifStmnt.ElseStatements[i].Accept(this);
+            for (var i = 0; i < ifStmnt.Else.Count; i += 1) {
+                ifStmnt.Else[i].Accept(this);
             }
         }
 

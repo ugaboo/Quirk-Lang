@@ -25,10 +25,10 @@ namespace Quirk.Visitors
 
             if (result.Count > 0) { throw new InvalidOperationException(); }
 
-            if (typeErrorFound) {
+            //if (typeErrorFound) {
                 ignoreErrors = false;
                 module.Accept(this);
-            }
+            //}
         }
 
         public void Visit(Module module)
@@ -141,14 +141,21 @@ namespace Quirk.Visitors
                             spec.Parameters[i].Type = types[i];
                         }
                         specFuncs.Add(func, spec);
+                        overload.Funcs.Add(spec);
                         spec.Accept(this);
                         result.Pop();
                     }
-                    funcCall.Func = spec;
+                    if (!ignoreErrors) {
+                        funcCall.Func = spec;
+                    }
                     result.Push((TypeObj)spec.RetType);
                 } else {
-                    funcCall.Func = func;
-                    result.Push((TypeObj)func.RetType);
+                    if (!ignoreErrors) {
+                        funcCall.Func = func;
+                        func.Accept(this);
+                    } else {
+                        result.Push((TypeObj)func.RetType);
+                    }
                 }
             } else {
                 throw new CompilationError(ObjectIsNotCallable);
@@ -157,17 +164,16 @@ namespace Quirk.Visitors
 
         public void Visit(IfStmnt ifStmnt)
         {
-            foreach (var (condition, statments) in ifStmnt.IfThen) {
-                condition.Accept(this);
-                var type = result.Pop();
-                if (type != BuiltIns.Bool) {
-                    throw new Exception("Not implemented");
-                }
-                foreach (var stmnt in statments) {
-                    stmnt.Accept(this);
-                }
+            ifStmnt.Condition.Accept(this);
+            var type = result.Pop();
+            if (type != BuiltIns.Bool) {
+                throw new Exception("Not implemented");
             }
-            foreach (var stmnt in ifStmnt.ElseStatements) {
+
+            foreach (var stmnt in ifStmnt.Then) {
+                stmnt.Accept(this);
+            }
+            foreach (var stmnt in ifStmnt.Else) {
                 stmnt.Accept(this);
             }
         }
