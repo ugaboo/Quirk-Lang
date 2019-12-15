@@ -118,10 +118,13 @@
     <None Update="Code\NameVisitor\BuiltIns.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Code\NameVisitor\DeferedDef1.qk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Code\NameVisitor\Errors\ObjectIsNotDefined.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Code\NameVisitor\DeferedDef.qk">
+    <None Update="Code\NameVisitor\DeferedDef2.qk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Code\NameVisitor\If.qk">

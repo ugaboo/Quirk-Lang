@@ -1,226 +1,77 @@
-﻿using Quirk.AST;
+﻿using System;
+using Quirk.Visitors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics;
 
-namespace Quirk.Tests
-{
+namespace Quirk.Tests {
     [TestClass()]
-    public class CodeGenVisitorTests
-    {
-        [TestMethod()]
-        public void Function()
-        {
-            new Parser("Code/CodeGenVisitor/Function.qk", "Function", out var module);
-            new Visitors.CodeGenVisitor(module);
+    public class CodeGenVisitorTests {
+        void Test(string name, string sample = null) {
+            new Parser($"Code/CodeGenVisitor/{name}.qk", name, out var module);
+            new CodeGenVisitor(module);
+            Link(name);
+            Execute(name, sample);
         }
 
-        [TestMethod()]
-        public void Variables()
-        {
-            new Parser("Code/CodeGenVisitor/Variables.qk", "Variables", out var module);
-            new Visitors.CodeGenVisitor(module);
+        void Link(string name) {
+            var clang = new Process();
+            clang.StartInfo.FileName = "clang";
+            clang.StartInfo.ArgumentList.Add("-w");
+            clang.StartInfo.ArgumentList.Add(name + ".ll");
+            clang.StartInfo.ArgumentList.Add("-o");
+            clang.StartInfo.ArgumentList.Add(name + ".exe");
+            clang.StartInfo.RedirectStandardError = true;
+            clang.Start();
+
+            var errors = clang.StandardError.ReadToEnd();
+            if (!string.IsNullOrWhiteSpace(errors)) {
+                throw new Exception(errors);
+            }
         }
 
-        [TestMethod()]
-        public void Return()
-        {
-            new Parser("Code/CodeGenVisitor/Return.qk", "Return", out var module);
-            new Visitors.CodeGenVisitor(module);
+        void Execute(string name, string sample) {
+            var exe = new Process();
+            exe.StartInfo.FileName = name + ".exe";
+            exe.StartInfo.RedirectStandardOutput = true;
+            exe.Start();
+
+            var output = exe.StandardOutput.ReadToEnd().Replace("\r", "");
+            if (sample != null && output != sample) {
+                throw new Exception(output);
+            }
         }
 
-        [TestMethod()]
-        public void Add()
-        {
-            new Parser("Code/CodeGenVisitor/Add.qk", "Add", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
 
-        [TestMethod()]
-        public void Sub()
-        {
-            new Parser("Code/CodeGenVisitor/Sub.qk", "Sub", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Mul()
-        {
-            new Parser("Code/CodeGenVisitor/Mul.qk", "Mul", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void TrueDiv()
-        {
-            new Parser("Code/CodeGenVisitor/TrueDiv.qk", "TrueDiv", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void FloorDiv()
-        {
-            new Parser("Code/CodeGenVisitor/FloorDiv.qk", "FloorDiv", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Mod()
-        {
-            new Parser("Code/CodeGenVisitor/Mod.qk", "Mod", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Pow()
-        {
-            new Parser("Code/CodeGenVisitor/Pow.qk", "Pow", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Pos()
-        {
-            new Parser("Code/CodeGenVisitor/Pos.qk", "Pos", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Neg()
-        {
-            new Parser("Code/CodeGenVisitor/Neg.qk", "Neg", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Lt()
-        {
-            new Parser("Code/CodeGenVisitor/Lt.qk", "Lt", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Gt()
-        {
-            new Parser("Code/CodeGenVisitor/Gt.qk", "Gt", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Le()
-        {
-            new Parser("Code/CodeGenVisitor/Le.qk", "Le", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Ge()
-        {
-            new Parser("Code/CodeGenVisitor/Ge.qk", "Ge", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Eq()
-        {
-            new Parser("Code/CodeGenVisitor/Eq.qk", "Eq", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Ne()
-        {
-            new Parser("Code/CodeGenVisitor/Ne.qk", "Ne", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Not()
-        {
-            new Parser("Code/CodeGenVisitor/Not.qk", "Not", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void BitAnd()
-        {
-            new Parser("Code/CodeGenVisitor/BitAnd.qk", "BitAnd", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void BitOr()
-        {
-            new Parser("Code/CodeGenVisitor/BitOr.qk", "BitOr", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void BitXor()
-        {
-            new Parser("Code/CodeGenVisitor/BitXor.qk", "BitXor", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Invert()
-        {
-            new Parser("Code/CodeGenVisitor/Invert.qk", "Invert", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void LShift()
-        {
-            new Parser("Code/CodeGenVisitor/LShift.qk", "LShift", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void RShift()
-        {
-            new Parser("Code/CodeGenVisitor/RShift.qk", "RShift", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Factorial()
-        {
-            new Parser("Code/CodeGenVisitor/Factorial.qk", "Factorial", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Factorial2()
-        {
-            new Parser("Code/CodeGenVisitor/Factorial2.qk", "Factorial2", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void If1()
-        {
-            new Parser("Code/CodeGenVisitor/If1.qk", "If1", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void If2()
-        {
-            new Parser("Code/CodeGenVisitor/If2.qk", "If2", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void If3()
-        {
-            new Parser("Code/CodeGenVisitor/If3.qk", "If3", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
-
-        [TestMethod()]
-        public void Fibonacci()
-        {
-            new Parser("Code/CodeGenVisitor/Fibonacci.qk", "Fibonacci", out var module);
-            new Visitors.CodeGenVisitor(module);
-        }
+        [TestMethod()] public void Function() { Test("Function"); }
+        [TestMethod()] public void Variables() { Test("Variables"); }
+        [TestMethod()] public void Return() { Test("Return"); }
+        [TestMethod()] public void Add() { Test("Add"); }
+        [TestMethod()] public void Sub() { Test("Sub"); }
+        [TestMethod()] public void Mul() { Test("Mul"); }
+        [TestMethod()] public void TrueDiv() { Test("TrueDiv"); }
+        [TestMethod()] public void FloorDiv() { Test("FloorDiv"); }
+        [TestMethod()] public void Mod() { Test("Mod"); }
+        [TestMethod()] public void Pow() { Test("Pow"); }
+        [TestMethod()] public void Pos() { Test("Pos"); }
+        [TestMethod()] public void Neg() { Test("Neg"); }
+        [TestMethod()] public void Lt() { Test("Lt"); }
+        [TestMethod()] public void Gt() { Test("Gt"); }
+        [TestMethod()] public void Le() { Test("Le"); }
+        [TestMethod()] public void Ge() { Test("Ge"); }
+        [TestMethod()] public void Eq() { Test("Eq"); }
+        [TestMethod()] public void Ne() { Test("Ne"); }
+        [TestMethod()] public void Not() { Test("Not"); }
+        [TestMethod()] public void BitAnd() { Test("BitAnd"); }
+        [TestMethod()] public void BitOr() { Test("BitOr"); }
+        [TestMethod()] public void BitXor() { Test("BitXor"); }
+        [TestMethod()] public void Invert() { Test("Invert"); }
+        [TestMethod()] public void LShift() { Test("LShift"); }
+        [TestMethod()] public void RShift() { Test("RShift"); }
+        [TestMethod()] public void Factorial() { Test("Factorial", "120\n"); }
+        [TestMethod()] public void Factorial2() { Test("Factorial2", "120\n"); }
+        [TestMethod()] public void If1() { Test("If1"); }
+        [TestMethod()] public void If2() { Test("If2"); }
+        [TestMethod()] public void If3() { Test("If3"); }
+        [TestMethod()] public void Fibonacci() { Test("Fibonacci", "55\n"); }
     }
 }

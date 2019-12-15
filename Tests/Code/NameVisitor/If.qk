@@ -1,8 +1,8 @@
 ﻿x = 0
 
 if x:
-	y = x
+	y1 = x
 elif x:
-	y = x
+	y2 = x
 else:
-	y = x
+	y3 = x

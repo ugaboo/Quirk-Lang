@@ -1,0 +1,13 @@
+﻿def first():
+	return second()
+
+def second():
+	return first()
+
+def third():
+	return fourth()
+
+first()
+
+def fourth():
+	return third()

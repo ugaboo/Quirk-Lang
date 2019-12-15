@@ -1,17 +1,13 @@
-﻿namespace Quirk.AST
-{
-    public class NameObj : ProgObj
-    {
+﻿namespace Quirk.AST {
+    public class NameObj: ProgObj {
         public readonly string Name;
 
 
-        public NameObj(string name)
-        {
+        public NameObj(string name) {
             Name = name;
         }
 
-        public override void Accept(IVisitor visitor)
-        {
+        public override void Accept(IVisitor visitor) {
             visitor.Visit(this);
         }
     }

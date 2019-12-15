@@ -13,7 +13,6 @@ namespace Quirk.Visitors
         readonly Stack<TypeObj> result = new Stack<TypeObj>();
 
         bool ignoreErrors;
-        bool typeErrorFound;
 
 
         public TypeVisitor(Module module)
@@ -25,10 +24,8 @@ namespace Quirk.Visitors
 
             if (result.Count > 0) { throw new InvalidOperationException(); }
 
-            //if (typeErrorFound) {
-                ignoreErrors = false;
-                module.Accept(this);
-            //}
+            ignoreErrors = false;
+            module.Accept(this);
         }
 
         public void Visit(Module module)
@@ -82,7 +79,6 @@ namespace Quirk.Visitors
             var type = result.Pop();
             if (type == null) {
                 if (ignoreErrors) {
-                    typeErrorFound = true;
                     return;
                 } else {
                     throw new CompilationError(CantDetermineType);
@@ -120,7 +116,6 @@ namespace Quirk.Visitors
                     var type = result.Pop();
                     if (type == null) {
                         if (ignoreErrors) {
-                            typeErrorFound = true;
                             result.Push(null);
                             return;
                         } else {

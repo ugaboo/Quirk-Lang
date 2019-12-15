@@ -2,4 +2,4 @@
 	return second()
 
 def second():
-	return True
+	return first()

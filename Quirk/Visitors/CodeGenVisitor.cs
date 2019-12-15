@@ -1,15 +1,14 @@
 ﻿using LLVMSharp;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Quirk.Helpers;
 
-namespace Quirk.Visitors
-{
-    public partial class CodeGenVisitor : AST.IVisitor
-    {
+namespace Quirk.Visitors {
+    public partial class CodeGenVisitor : AST.IVisitor {
         BuiltInsLLVM builtIns;
 
-        LLVMBuilderRef builder = LLVM.CreateBuilder();
+        LLVMBuilderRef builder;
 
         LLVMModuleRef moduleLLVM;
         LLVMValueRef mainFuncLLVM;
@@ -28,17 +27,23 @@ namespace Quirk.Visitors
         readonly Stack<AST.Function> hierarchy = new Stack<AST.Function>();
 
 
-               
+        public CodeGenVisitor(AST.Module module) {
+            builder = LLVM.CreateBuilder();
 
-        public CodeGenVisitor(AST.Module module)
-        {
+            LLVM.InitializeX86Target();
+            LLVM.InitializeX86TargetInfo();
+            LLVM.InitializeX86TargetMC();
+
             new TypeVisitor(module);
             module.Accept(this);
+
+            LLVM.DisposeBuilder(builder);
         }
 
-        public void Visit(AST.Module module)
-        {
+        public void Visit(AST.Module module) {
             moduleLLVM = LLVM.ModuleCreateWithName(module.Name);
+            var triple = Marshal.PtrToStringAnsi(LLVM.GetDefaultTargetTriple());
+            LLVM.SetTarget(moduleLLVM, triple);
 
             builtIns = new BuiltInsLLVM(builder, moduleLLVM);
 
@@ -72,8 +77,7 @@ namespace Quirk.Visitors
 
         public void Visit(AST.Overload overload) { throw new InvalidOperationException(); }
 
-        public void Visit(AST.Function func)
-        {
+        public void Visit(AST.Function func) {
             if (func.BuiltIn) { values.Push(builtIns.Find(func)); return; }
 
             hierarchy.Push(func);
@@ -119,8 +123,7 @@ namespace Quirk.Visitors
             hierarchy.Pop();
         }
 
-        public void Visit(AST.Variable variable)
-        {
+        public void Visit(AST.Variable variable) {
             LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
             values.Push(LLVM.BuildLoad(builder, llvmVars[variable], ""));
 
@@ -130,23 +133,20 @@ namespace Quirk.Visitors
             //values[variable] = variableLLVM;
         }
 
-        public void Visit(AST.Parameter parameter)
-        {
+        public void Visit(AST.Parameter parameter) {
             values.Push(llvmParams[parameter]);
         }
 
         public void Visit(AST.Tuple tuple) { throw new Exception("Not implemented"); }
 
-        public void Visit(AST.FuncDef funcDef)
-        {
+        public void Visit(AST.FuncDef funcDef) {
             if (funcDef.Func.TemplateParamsCount == 0) {
                 funcDef.Func.Accept(this);
             }
             returns = false;
         }
 
-        public void Visit(AST.Assignment assignment)
-        {
+        public void Visit(AST.Assignment assignment) {
             LLVMValueRef left;
             if (assignment.Left is AST.Variable variable) {
                 if (llvmVars.TryGetValue(variable, out var variableLLVM) == false) {
@@ -170,16 +170,14 @@ namespace Quirk.Visitors
             returns = false;
         }
 
-        public void Visit(AST.Evaluation evaluation)
-        {
+        public void Visit(AST.Evaluation evaluation) {
             evaluation.Expr.Accept(this);
             values.Pop();
 
             returns = false;
         }
 
-        public void Visit(AST.FuncCall funcCall)
-        {
+        public void Visit(AST.FuncCall funcCall) {
             funcCall.Func.Accept(this);
             var funcLLVM = values.Pop();
 
@@ -194,8 +192,7 @@ namespace Quirk.Visitors
             values.Push(funcCallLLVM);
         }
 
-        public void Visit(AST.IfStmnt ifStmnt)
-        {
+        public void Visit(AST.IfStmnt ifStmnt) {
             var funcLLVM = hierarchy.Count > 0 ? llvmFuncs[hierarchy.Peek()] : mainFuncLLVM;
 
             var thenBlock = LLVM.AppendBasicBlock(funcLLVM, "then");
@@ -247,8 +244,7 @@ namespace Quirk.Visitors
             returns = thenReturns && elseReturns;
         }
 
-        public void Visit(AST.ReturnStmnt returnStmnt)
-        {
+        public void Visit(AST.ReturnStmnt returnStmnt) {
             var vals = new List<LLVMValueRef>();
             foreach (var val in returnStmnt.Values) {
                 val.Accept(this);
@@ -267,28 +263,23 @@ namespace Quirk.Visitors
 
         public void Visit(AST.NameObj nameObj) { throw new InvalidOperationException(); }
 
-        public void Visit(AST.ConstBool constBool)
-        {
+        public void Visit(AST.ConstBool constBool) {
             values.Push(LLVM.ConstInt(BuiltIns.Bool.ToLLVM(), Convert.ToUInt64(constBool.Value), false));
         }
 
-        public void Visit(AST.ConstInt constInt)
-        {
+        public void Visit(AST.ConstInt constInt) {
             values.Push(LLVM.ConstInt(BuiltIns.Int.ToLLVM(), Convert.ToUInt64(constInt.Value), false));
         }
 
-        public void Visit(AST.ConstFloat constFloat)
-        {
+        public void Visit(AST.ConstFloat constFloat) {
             values.Push(LLVM.ConstReal(BuiltIns.Float.ToLLVM(), Convert.ToDouble(constFloat.Value)));
         }
 
-        public void Visit(AST.TypeObj typeObj)
-        {
+        public void Visit(AST.TypeObj typeObj) {
             types.Push(typeObj.ToLLVM());
         }
 
-        string DetermineName()
-        {
+        string DetermineName() {
             var name = "";
             foreach (var func in hierarchy) {
                 if (name == "") {
@@ -300,8 +291,7 @@ namespace Quirk.Visitors
             return name;
         }
 
-        LLVMTypeRef[] GetTypes(List<AST.Parameter> parameters)
-        {
+        LLVMTypeRef[] GetTypes(List<AST.Parameter> parameters) {
             var result = new LLVMTypeRef[parameters.Count];
             for (var i = 0; i < parameters.Count; i += 1) {
                 parameters[i].Type.Accept(this);

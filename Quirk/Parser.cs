@@ -2,21 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Quirk
-{
-    public class Parser
-    {
+namespace Quirk {
+    public class Parser {
         Scanner scan;
 
 
-        public Parser(string filename, string name, out AST.Module module)
-        {
+        public Parser(string filename, string name, out AST.Module module) {
             scan = new Scanner(filename);
             Module(name, out module);
         }
 
-        bool Module(string name, out AST.Module module)
-        {
+        bool Module(string name, out AST.Module module) {
             module = new AST.Module(name);
         _0:
             if (scan.Lexeme == Lexeme.EndMarker) {
@@ -30,8 +26,7 @@ namespace Quirk
             return true;
         }
 
-        bool Stmnt(List<AST.ProgObj> statements)
-        {
+        bool Stmnt(List<AST.ProgObj> statements) {
             if (SimpleStmnt(statements)) {
                 goto _end;
             }
@@ -43,8 +38,7 @@ namespace Quirk
             return true;
         }
 
-        bool SimpleStmnt(List<AST.ProgObj> statements)
-        {
+        bool SimpleStmnt(List<AST.ProgObj> statements) {
             if (SmallStmnt(statements)) {
                 goto _1;
             }
@@ -74,8 +68,7 @@ namespace Quirk
             return true;
         }
 
-        bool SmallStmnt(List<AST.ProgObj> statements)
-        {
+        bool SmallStmnt(List<AST.ProgObj> statements) {
             if (ExprStmnt(statements)) {
                 goto _end;
             }
@@ -90,8 +83,7 @@ namespace Quirk
             return true;
         }
 
-        bool ExprStmnt(List<AST.ProgObj> statements)
-        {
+        bool ExprStmnt(List<AST.ProgObj> statements) {
             var rightParts = new List<AST.ProgObj>();
 
             if (TestlistStarExpr(out var left)) {
@@ -124,8 +116,7 @@ namespace Quirk
             return true;
         }
 
-        bool PassStmnt()
-        {
+        bool PassStmnt() {
             if (scan.Lexeme == Lexeme.KwPass) {
                 scan.Next();
                 goto _end;
@@ -135,8 +126,7 @@ namespace Quirk
             return true;
         }
 
-        bool TestlistStarExpr(out AST.ProgObj expr)
-        {
+        bool TestlistStarExpr(out AST.ProgObj expr) {
             if (Test(out expr)) {
                 goto _1;
             }
@@ -156,8 +146,7 @@ namespace Quirk
             return true;
         }
 
-        bool Test(out AST.ProgObj expr)
-        {
+        bool Test(out AST.ProgObj expr) {
             if (OrTest(out expr)) {
                 goto _1;
             }
@@ -168,8 +157,7 @@ namespace Quirk
             return true;
         }
 
-        bool OrTest(out AST.ProgObj expr)
-        {
+        bool OrTest(out AST.ProgObj expr) {
             if (AndTest(out expr)) {
                 goto _2;
             }
@@ -190,8 +178,7 @@ namespace Quirk
             return true;
         }
 
-        bool AndTest(out AST.ProgObj expr)
-        {
+        bool AndTest(out AST.ProgObj expr) {
             if (NotTest(out expr)) {
                 goto _2;
             }
@@ -212,8 +199,7 @@ namespace Quirk
             return true;
         }
 
-        bool NotTest(out AST.ProgObj expr)
-        {
+        bool NotTest(out AST.ProgObj expr) {
             if (scan.Lexeme == Lexeme.KwNot) {
                 scan.Next();
                 goto _1;
@@ -232,8 +218,7 @@ namespace Quirk
             return true;
         }
 
-        bool Comparison(out AST.ProgObj expr)
-        {
+        bool Comparison(out AST.ProgObj expr) {
             string name;
             AST.ProgObj left;
             var chained = false;
@@ -265,8 +250,7 @@ namespace Quirk
             return true;
         }
 
-        bool CompOp(out string name)
-        {
+        bool CompOp(out string name) {
             if (scan.Lexeme == Lexeme.Less) {
                 name = "__lt__";
                 scan.Next();
@@ -303,8 +287,7 @@ namespace Quirk
             return true;
         }
 
-        bool Expr(out AST.ProgObj expr)
-        {
+        bool Expr(out AST.ProgObj expr) {
             if (XorExpr(out expr)) {
                 goto _2;
             }
@@ -325,8 +308,7 @@ namespace Quirk
             return true;
         }
 
-        bool XorExpr(out AST.ProgObj expr)
-        {
+        bool XorExpr(out AST.ProgObj expr) {
             if (AndExpr(out expr)) {
                 goto _2;
             }
@@ -347,8 +329,7 @@ namespace Quirk
             return true;
         }
 
-        bool AndExpr(out AST.ProgObj expr)
-        {
+        bool AndExpr(out AST.ProgObj expr) {
             if (ShiftExpr(out expr)) {
                 goto _2;
             }
@@ -369,8 +350,7 @@ namespace Quirk
             return true;
         }
 
-        bool ShiftExpr(out AST.ProgObj expr)
-        {
+        bool ShiftExpr(out AST.ProgObj expr) {
             string name;
 
             if (ArithExpr(out expr)) {
@@ -399,8 +379,7 @@ namespace Quirk
             return true;
         }
 
-        bool ArithExpr(out AST.ProgObj expr)
-        {
+        bool ArithExpr(out AST.ProgObj expr) {
             string name;
 
             if (Term(out expr)) {
@@ -429,8 +408,7 @@ namespace Quirk
             return true;
         }
 
-        bool Term(out AST.ProgObj expr)
-        {
+        bool Term(out AST.ProgObj expr) {
             string name;
 
             if (Factor(out expr)) {
@@ -470,8 +448,7 @@ namespace Quirk
             return true;
         }
 
-        bool Factor(out AST.ProgObj expr)
-        {
+        bool Factor(out AST.ProgObj expr) {
             string name;
 
             if (Power(out expr)) {
@@ -504,8 +481,7 @@ namespace Quirk
             return true;
         }
 
-        bool Power(out AST.ProgObj expr)
-        {
+        bool Power(out AST.ProgObj expr) {
             if (AtomExpr(out expr)) {
                 goto _1;
             }
@@ -527,8 +503,7 @@ namespace Quirk
             return true;
         }
 
-        bool AtomExpr(out AST.ProgObj expr)
-        {
+        bool AtomExpr(out AST.ProgObj expr) {
             if (Atom(out expr)) {
                 goto _2;
             }
@@ -550,8 +525,7 @@ namespace Quirk
             return true;
         }
 
-        bool Atom(out AST.ProgObj obj)
-        {
+        bool Atom(out AST.ProgObj obj) {
             if (scan.Lexeme == Lexeme.LeftParenthesis) {
                 scan.Next();
                 goto _1;
@@ -599,8 +573,7 @@ namespace Quirk
             return true;
         }
 
-        bool Trailer(AST.ProgObj atom, out AST.ProgObj expr)
-        {
+        bool Trailer(AST.ProgObj atom, out AST.ProgObj expr) {
             if (scan.Lexeme == Lexeme.LeftParenthesis) {
                 scan.Next();
                 goto _1;
@@ -624,8 +597,7 @@ namespace Quirk
             return true;
         }
 
-        bool TestlistComp(out AST.ProgObj obj)
-        {
+        bool TestlistComp(out AST.ProgObj obj) {
             if (Test(out obj)) {
                 goto _1;
             }
@@ -652,8 +624,7 @@ namespace Quirk
             return true;
         }
 
-        bool Arglist(out List<AST.ProgObj> args)
-        {
+        bool Arglist(out List<AST.ProgObj> args) {
             args = new List<AST.ProgObj>();
 
             if (Argument(out var expr)) {
@@ -677,8 +648,7 @@ namespace Quirk
             return true;
         }
 
-        bool Argument(out AST.ProgObj expr)
-        {
+        bool Argument(out AST.ProgObj expr) {
             if (Test(out expr)) {
                 goto _1;
             }
@@ -698,8 +668,7 @@ namespace Quirk
             return true;
         }
 
-        bool CompoundStmnt(List<AST.ProgObj> statements)
-        {
+        bool CompoundStmnt(List<AST.ProgObj> statements) {
             if (IfStmnt(statements)) {
                 goto _end;
             }
@@ -711,8 +680,7 @@ namespace Quirk
             return true;
         }
 
-        bool IfStmnt(List<AST.ProgObj> statements)
-        {
+        bool IfStmnt(List<AST.ProgObj> statements) {
             AST.IfStmnt result, ifStmnt;
 
             if (scan.Lexeme == Lexeme.KwIf) {
@@ -784,8 +752,7 @@ namespace Quirk
             return true;
         }
 
-        bool Suite(List<AST.ProgObj> statements)
-        {
+        bool Suite(List<AST.ProgObj> statements) {
             if (SimpleStmnt(statements)) {
                 goto _end;
             }
@@ -822,8 +789,7 @@ namespace Quirk
             return true;
         }
 
-        bool FuncDef(List<AST.ProgObj> statements)
-        {
+        bool FuncDef(List<AST.ProgObj> statements) {
             string name;
             AST.Function func;
 
@@ -873,8 +839,7 @@ namespace Quirk
             return true;
         }
 
-        bool Parameters(List<AST.Parameter> parameters)
-        {
+        bool Parameters(List<AST.Parameter> parameters) {
             if (scan.Lexeme == Lexeme.LeftParenthesis) {
                 scan.Next();
                 goto _1;
@@ -895,8 +860,7 @@ namespace Quirk
             return true;
         }
 
-        bool TypedArgsList(List<AST.Parameter> parameters)
-        {
+        bool TypedArgsList(List<AST.Parameter> parameters) {
             if (Arg(out var argument)) {
                 parameters.Add(argument);
 
@@ -920,8 +884,7 @@ namespace Quirk
             return true;
         }
 
-        bool Arg(out AST.Parameter argument)
-        {
+        bool Arg(out AST.Parameter argument) {
             if (TypedFormalParamDef(out argument)) {
                 goto _1;
             }
@@ -932,8 +895,7 @@ namespace Quirk
             return true;
         }
 
-        bool TypedFormalParamDef(out AST.Parameter param)
-        {
+        bool TypedFormalParamDef(out AST.Parameter param) {
             if (scan.Lexeme == Lexeme.Id) {
                 param = new AST.Parameter(scan.TextValue());
 
@@ -957,8 +919,7 @@ namespace Quirk
             return true;
         }
 
-        bool FlowStmnt(List<AST.ProgObj> statements)
-        {
+        bool FlowStmnt(List<AST.ProgObj> statements) {
             if (ReturnStmnt(out var stmnt)) {
                 statements.Add(stmnt);
                 goto _end;
@@ -968,8 +929,7 @@ namespace Quirk
             return true;
         }
 
-        bool ReturnStmnt(out AST.ReturnStmnt stmnt)
-        {
+        bool ReturnStmnt(out AST.ReturnStmnt stmnt) {
             if (scan.Lexeme == Lexeme.KwReturn) {
                 stmnt = new AST.ReturnStmnt();
 
@@ -987,8 +947,7 @@ namespace Quirk
             return true;
         }
 
-        bool TestList(List<AST.ProgObj> expressions)
-        {
+        bool TestList(List<AST.ProgObj> expressions) {
             if (Test(out var expr)) {
                 expressions.Add(expr);
                 goto _1;

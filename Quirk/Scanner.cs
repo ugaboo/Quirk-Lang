@@ -2,10 +2,8 @@
 using System.Text;
 using System.Collections.Generic;
 
-namespace Quirk
-{
-    public class Scanner
-    {
+namespace Quirk {
+    public class Scanner {
         static Dictionary<string, Lexeme> keywords = new Dictionary<string, Lexeme>() {
             { "and", Lexeme.KwAnd },
             { "def", Lexeme.KwDef },
@@ -33,8 +31,7 @@ namespace Quirk
         public Position LexemePosition { get; private set; }
 
 
-        public Scanner(string filename)
-        {
+        public Scanner(string filename) {
             indentation.Push(0);
 
             textValue = new StringBuilder();
@@ -46,14 +43,12 @@ namespace Quirk
             Next();
         }
 
-        void SetLexeme(Lexeme value)
-        {
+        void SetLexeme(Lexeme value) {
             Lexeme = value;
             reader.Next();
         }
 
-        public void Next()
-        {
+        public void Next() {
             do {
                 Lexeme = Lexeme.Error;
                 LexemePosition = reader.Position;
@@ -209,8 +204,7 @@ namespace Quirk
             } while (Lexeme == Lexeme.Ignore);
         }
 
-        void Indentation()
-        {
+        void Indentation() {
             while (true) {
                 if (reader.Value == ' ') {
                     indent += 1;
@@ -245,8 +239,7 @@ namespace Quirk
             }
         }
 
-        bool IdStart()
-        {
+        bool IdStart() {
             switch (char.GetUnicodeCategory(reader.Value)) {
                 case UnicodeCategory.UppercaseLetter:
                 case UnicodeCategory.LowercaseLetter:
@@ -269,8 +262,7 @@ namespace Quirk
             return false;
         }
 
-        bool IdContinue()
-        {
+        bool IdContinue() {
             switch (char.GetUnicodeCategory(reader.Value)) {
                 case UnicodeCategory.NonSpacingMark:
                 case UnicodeCategory.SpacingCombiningMark:
@@ -290,8 +282,7 @@ namespace Quirk
             return IdStart();
         }
 
-        void Id()
-        {
+        void Id() {
             Lexeme = Lexeme.Id;
             do {
                 textValue.Append(reader.Value);
@@ -299,20 +290,17 @@ namespace Quirk
             } while (IdContinue());
         }
 
-        void ConvertToKeyword()
-        {
+        void ConvertToKeyword() {
             if (keywords.TryGetValue(textValue.ToString(), out var keyword)) {
                 Lexeme = keyword;
             }
         }
 
-        bool Digit()
-        {
+        bool Digit() {
             return (reader.Value >= '0' && reader.Value <= '9');
         }
 
-        void Int()
-        {
+        void Int() {
             Lexeme = Lexeme.Int;
             while (Digit()) {
                 intPart.Append(reader.Value);
@@ -324,8 +312,7 @@ namespace Quirk
             }
         }
 
-        void Float()
-        {
+        void Float() {
             Lexeme = Lexeme.Float;
             while (Digit()) {
                 floatPart.Append(reader.Value);
@@ -333,30 +320,25 @@ namespace Quirk
             }
         }
 
-        bool Whitespace()
-        {
+        bool Whitespace() {
             return (reader.Value == ' ' || reader.Value == '\t' || reader.Value == '\f');
         }
 
-        void SkipComment()
-        {
+        void SkipComment() {
             do {
                 reader.Next();
             } while (reader.Value != '\n' && reader.Value != '\r' && reader.Value != char.MaxValue);
         }
 
-        public int ToInt()
-        {
+        public int ToInt() {
             return int.Parse(intPart.ToString(), CultureInfo.InvariantCulture);
         }
 
-        public float ToSingle()
-        {
+        public float ToSingle() {
             return float.Parse($"{intPart}.{floatPart}", CultureInfo.InvariantCulture);
         }
 
-        public string TextValue()
-        {
+        public string TextValue() {
             return textValue.ToString();
         }
     }

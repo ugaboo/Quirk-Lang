@@ -4,59 +4,44 @@ using Quirk.AST;
 using Quirk.Helpers;
 using NameTable = System.Collections.Generic.Dictionary<string, Quirk.AST.ProgObj>;
 
-namespace Quirk.Visitors
-{
-    public partial class NameVisitor : IVisitor
-    {
+namespace Quirk.Visitors {
+    public partial class NameVisitor : IVisitor {
         Stack<NameTable> nameTables = new Stack<NameTable>();
-        Stack<Function> deferedDefs = new Stack<Function>();
-
-        ProgObj Find(string name)
-        {
-            foreach (var table in nameTables) {
-                if (table.TryGetValue(name, out var obj)) {
-                    return obj;
-                }
-            }
-            return null;
-        }
-
-        void Replace(ref ProgObj obj)
-        {
-            if (obj is NameObj named) {
-                var found = Find(named.Name);
-                obj = found ?? throw new CompilationError(ErrorType.ObjectIsNotDefined);
-            } else {
-                obj.Accept(this);
-            }
-        }
+        Stack<List<Function>> defs = new Stack<List<Function>>();
 
 
-        public NameVisitor(Module module)
-        {
+        public NameVisitor(Module module) {
             module.Accept(this);
         }
 
-        public void Visit(Module module)
-        {
+        public void Visit(Module module) {
             var moduleTable = new NameTable();
 
             AddBuiltIns(moduleTable);
 
             nameTables.Push(moduleTable);
+            defs.Push(new List<Function>());
             foreach (var statement in module.Statements) {
                 statement.Accept(this);
             }
-            while (deferedDefs.Count > 0) {
-                deferedDefs.Pop().Accept(this);
+            var list = defs.Peek();
+            while (list.Count > 0) {
+                var last = list.Count - 1;
+                var def = list[last];
+                list.RemoveAt(last);
+                def.Accept(this);
             }
+            defs.Pop();
             nameTables.Pop();
+
+            if (nameTables.Count > 0 || defs.Count > 0) {
+                throw new InvalidOperationException();
+            }
         }
 
         public void Visit(Overload overload) { throw new InvalidOperationException(); }
 
-        public void Visit(Function func)
-        {
+        public void Visit(Function func) {
             var funcTable = new NameTable();
 
             foreach (var param in func.Parameters) {
@@ -73,24 +58,18 @@ namespace Quirk.Visitors
             }
 
             nameTables.Push(funcTable);
+            defs.Push(new List<Function>());
             foreach (var statement in func.Statements) {
                 statement.Accept(this);
             }
-            while (deferedDefs.Count > 0) {
-                deferedDefs.Pop().Accept(this);
-            }
+            VisitLocalDefs();
+            defs.Pop();
             nameTables.Pop();
         }
 
-        public void Visit(Variable variable)
-        {
-            if (variable.Type != null) {
-                Replace(ref variable.Type);
-            }
-        }
+        public void Visit(Variable variable) { throw new InvalidOperationException(); }
 
-        public void Visit(Parameter parameter)
-        {
+        public void Visit(Parameter parameter) {
             if (parameter.Type != null) {
                 Replace(ref parameter.Type);
             }
@@ -98,23 +77,20 @@ namespace Quirk.Visitors
 
         public void Visit(AST.Tuple tuple) { throw new Exception("Not implemented"); }
 
-        public void Visit(FuncDef funcDef)
-        {
+        public void Visit(FuncDef funcDef) {
             var func = funcDef.Func;
             var name = func.Name;
             if (Find(name) is Overload overload) {
                 overload = new Overload(overload);
             } else {
-                overload = new Overload(name);                
+                overload = new Overload(name);
             }
             overload.Funcs.Add(func);
             nameTables.Peek()[name] = overload;
-            //func.Accept(this);
-            deferedDefs.Push(func);
+            defs.Peek().Add(func);
         }
 
-        public void Visit(Assignment assignment)
-        {
+        public void Visit(Assignment assignment) {
             if (assignment.Left is NameObj named) {
                 assignment.Left = Find(named.Name);
                 if (assignment.Left == null) {
@@ -125,21 +101,24 @@ namespace Quirk.Visitors
             } else {
                 assignment.Left.Accept(this);
             }
-
             Replace(ref assignment.Right);
         }
 
-        public void Visit(Evaluation evaluation)
-        {
+        public void Visit(Evaluation evaluation) {
             Replace(ref evaluation.Expr);
         }
 
-        public void Visit(FuncCall funcCall)
-        {
+        public void Visit(FuncCall funcCall) {
             Replace(ref funcCall.Func);
             var overload = (Overload)funcCall.Func;
             var localCopy = new Overload(overload);
             funcCall.Func = localCopy;
+
+            foreach (var func in overload.Funcs) {
+                if (RemoveDef(func)) {
+                    func.Accept(this);
+                }
+            }
 
             var args = funcCall.Args;
             for (var i = 0; i < args.Count; i += 1) {
@@ -147,14 +126,9 @@ namespace Quirk.Visitors
                 Replace(ref arg);
                 args[i] = arg;
             }
-
-            while (deferedDefs.Count > 0) {
-                deferedDefs.Pop().Accept(this);
-            }
         }
 
-        public void Visit(IfStmnt ifStmnt)
-        {
+        public void Visit(IfStmnt ifStmnt) {
             Replace(ref ifStmnt.Condition);
 
             for (var i = 0; i < ifStmnt.Then.Count; i += 1) {
@@ -165,8 +139,7 @@ namespace Quirk.Visitors
             }
         }
 
-        public void Visit(ReturnStmnt returnStmnt)
-        {
+        public void Visit(ReturnStmnt returnStmnt) {
             var vals = returnStmnt.Values;
             for (var i = 0; i < vals.Count; i += 1) {
                 var val = vals[i];
@@ -186,8 +159,44 @@ namespace Quirk.Visitors
         public void Visit(TypeObj typeObj) { throw new InvalidOperationException(); }
 
 
-        void AddBuiltIns(NameTable table)
-        {
+        ProgObj Find(string name) {
+            foreach (var table in nameTables) {
+                if (table.TryGetValue(name, out var obj)) {
+                    return obj;
+                }
+            }
+            return null;
+        }
+
+        void Replace(ref ProgObj obj) {
+            if (obj is NameObj named) {
+                var found = Find(named.Name);
+                obj = found ?? throw new CompilationError(ErrorType.ObjectIsNotDefined);
+            } else {
+                obj.Accept(this);
+            }
+        }
+
+        bool RemoveDef(Function func) {
+            foreach (var list in defs) {
+                if (list.Remove(func) == true) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void VisitLocalDefs() {
+            var list = defs.Peek();
+            while (list.Count > 0) {
+                var last = list.Count - 1;
+                var def = list[last];
+                list.RemoveAt(last);
+                def.Accept(this);
+            }
+        }
+
+        void AddBuiltIns(NameTable table) {
             table["Int"] = BuiltIns.Int;
             table["Float"] = BuiltIns.Float;
             table["Bool"] = BuiltIns.Bool;
