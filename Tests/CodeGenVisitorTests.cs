@@ -73,5 +73,9 @@ namespace Quirk.Tests {
         [TestMethod()] public void If2() { Test("If2"); }
         [TestMethod()] public void If3() { Test("If3"); }
         [TestMethod()] public void Fibonacci() { Test("Fibonacci", "55\n"); }
+        [TestMethod()] public void Init() { Test("Init", "True\nFalse\nTrue\nFalse\n"); }
+
+        [TestMethod()] public void And() { Test("And", "True\n"); }
+        [TestMethod()] public void Or() { Test("Or", "1\n8\n3\n"); }
     }
 }

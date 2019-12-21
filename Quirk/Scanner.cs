@@ -59,10 +59,12 @@ namespace Quirk {
                 expPart.Clear();
 
                 if (reader.Position.Column == 1) {
-                    Indentation();
-                    if (Lexeme == Lexeme.Indent || Lexeme == Lexeme.Dedent) {
-                        break;
-                    }
+                    CountIndentation();
+                }
+
+                CheckIndentation();
+                if (Lexeme == Lexeme.Indent || Lexeme == Lexeme.Dedent) {
+                    break;
                 }
 
                 if (Whitespace()) {
@@ -204,7 +206,7 @@ namespace Quirk {
             } while (Lexeme == Lexeme.Ignore);
         }
 
-        void Indentation() {
+        void CountIndentation() {
             while (true) {
                 if (reader.Value == ' ') {
                     indent += 1;
@@ -223,7 +225,9 @@ namespace Quirk {
                 }
                 reader.Next();
             }
+        }
 
+        void CheckIndentation() {
             if (indent > indentation.Peek()) {
                 indentation.Push(indent);
                 Lexeme = Lexeme.Indent;

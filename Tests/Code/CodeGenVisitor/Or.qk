@@ -1,0 +1,11 @@
+﻿def __init__(a) -> Bool:
+    return a
+
+def __or__(a, b):
+    if Bool(b) == False:
+        return a
+    return b
+
+print(0 or 1)
+print(8 or 0)
+print(5 or 3)

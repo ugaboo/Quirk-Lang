@@ -1,0 +1,4 @@
+﻿print(Bool(-5))
+print(Bool(0))
+print(Bool(2.0))
+print(Bool(0.0))

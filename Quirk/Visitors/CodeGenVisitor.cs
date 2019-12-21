@@ -108,7 +108,7 @@ namespace Quirk.Visitors {
                         break;
                     }
                 }
-                if (func.RetType == null && !returns) {
+                if (returns == false && func.RetType == null) {
                     LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
                     LLVM.BuildRetVoid(builder);
                 }
@@ -142,6 +142,10 @@ namespace Quirk.Visitors {
         public void Visit(AST.FuncDef funcDef) {
             if (funcDef.Func.TemplateParamsCount == 0) {
                 funcDef.Func.Accept(this);
+            } else {
+                foreach (var spec in funcDef.Specs) {
+                    spec.Accept(this);
+                }
             }
             returns = false;
         }
@@ -197,14 +201,14 @@ namespace Quirk.Visitors {
 
             var thenBlock = LLVM.AppendBasicBlock(funcLLVM, "then");
             var elseBlock = LLVM.AppendBasicBlock(funcLLVM, "else");
+            var endBlock = LLVM.AppendBasicBlock(funcLLVM, "end");
 
-            LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
             ifStmnt.Condition.Accept(this);
+            LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
             LLVM.BuildCondBr(builder, values.Pop(), thenBlock, elseBlock);
-
             codeBlocks.Pop();
-            codeBlocks.Push(thenBlock);
 
+            codeBlocks.Push(thenBlock);
             var thenReturns = false;
             foreach (var stmnt in ifStmnt.Then) {
                 stmnt.Accept(this);
@@ -213,10 +217,13 @@ namespace Quirk.Visitors {
                     break;
                 }
             }
-
+            if (!thenReturns) {
+                LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
+                LLVM.BuildBr(builder, endBlock);
+            }
             codeBlocks.Pop();
-            codeBlocks.Push(elseBlock);
 
+            codeBlocks.Push(elseBlock);
             var elseReturns = false;
             foreach (var stmnt in ifStmnt.Else) {
                 stmnt.Accept(this);
@@ -225,23 +232,17 @@ namespace Quirk.Visitors {
                     break;
                 }
             }
-
-            if (thenReturns == false || elseReturns == false) {
-                var endBlock = LLVM.AppendBasicBlock(funcLLVM, "end");
-
-                if (!thenReturns) {
-                    LLVM.PositionBuilderAtEnd(builder, thenBlock);
-                    LLVM.BuildBr(builder, endBlock);
-                }
-                if (!elseReturns) {
-                    LLVM.PositionBuilderAtEnd(builder, elseBlock);
-                    LLVM.BuildBr(builder, endBlock);
-                }
-                codeBlocks.Pop();
-                codeBlocks.Push(endBlock);
+            if (!elseReturns) {
+                LLVM.PositionBuilderAtEnd(builder, codeBlocks.Peek());
+                LLVM.BuildBr(builder, endBlock);
             }
+            codeBlocks.Pop();
 
+            codeBlocks.Push(endBlock);
             returns = thenReturns && elseReturns;
+            if (returns) {
+                LLVM.RemoveBasicBlockFromParent(endBlock);
+            }
         }
 
         public void Visit(AST.ReturnStmnt returnStmnt) {

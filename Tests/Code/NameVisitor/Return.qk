@@ -1,2 +1,2 @@
 ﻿x = y = 1
-return x, y
+return x, y, x + y

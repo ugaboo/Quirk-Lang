@@ -23,6 +23,13 @@ namespace Quirk.Helpers
             printf = LLVM.AddFunction(module, "printf", LLVM.FunctionType(LLVM.Int32Type(), new[] { LLVM.PointerType(LLVM.Int8Type(), 0) }, true));
             pow = LLVM.AddFunction(module, "pow", LLVM.FunctionType(LLVM.DoubleType(), new[] { LLVM.DoubleType(), LLVM.DoubleType() }, false));
 
+            #region __init__
+
+            Gen_Bool_Init_Int();
+            Gen_Bool_Init_Float();
+
+            #endregion
+
             #region print
 
             Gen_Print_Int();
@@ -331,6 +338,24 @@ namespace Quirk.Helpers
             var attr = LLVM.CreateStringAttribute(LLVM.GetGlobalContext(), key, (uint)key.Length, "", 0);
             LLVM.AddAttributeAtIndex(func, LLVMAttributeIndex.LLVMAttributeFunctionIndex, attr);
         }
+
+        #region __init__
+
+        void Gen_Bool_Init_Int() {
+            var par = GenHeader(BuiltIns.Bool_Init_Int);
+            var zero = LLVM.ConstInt(LLVM.Int32Type(), 0, false);
+            var op = LLVM.BuildICmp(builder, LLVMIntPredicate.LLVMIntNE, par[0], zero, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        void Gen_Bool_Init_Float() {
+            var par = GenHeader(BuiltIns.Bool_Init_Float);
+            var zero = LLVM.ConstReal(LLVM.FloatType(), 0);
+            var op = LLVM.BuildFCmp(builder, LLVMRealPredicate.LLVMRealUNE, par[0], zero, "");
+            LLVM.BuildRet(builder, op);
+        }
+
+        #endregion
 
         #region print
 
@@ -1600,7 +1625,7 @@ namespace Quirk.Helpers
 
         #endregion
 
-        #region __not__
+        #region __invert__
 
         void Gen_Invert_Int()
         {

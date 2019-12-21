@@ -1,0 +1,6 @@
+﻿def f():
+    def first():
+        return second()
+    def second():
+        return first()
+    first()

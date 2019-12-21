@@ -5,10 +5,12 @@ namespace Quirk.AST
     public class Function : ProgObj
     {
         public readonly string Name;
-        public readonly bool BuiltIn;     // will be removed after implementation of the import system
+        public readonly bool BuiltIn;
+
+        public FuncDef Def;
 
         public readonly List<Parameter> Parameters = new List<Parameter>();
-        public ProgObj RetType;     // TODO: TypeObj
+        public ProgObj RetType;
 
         public readonly List<ProgObj> Statements = new List<ProgObj>();
 

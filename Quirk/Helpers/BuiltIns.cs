@@ -7,9 +7,13 @@ namespace Quirk.Helpers
 {
     public static class BuiltIns
     {
+
         public static readonly TypeObj Int = new TypeObj("Int");
         public static readonly TypeObj Float = new TypeObj("Float");
         public static readonly TypeObj Bool = new TypeObj("Bool");
+
+        public static readonly Function Bool_Init_Int = new Function(Bool, "__init__", Int);
+        public static readonly Function Bool_Init_Float = new Function(Bool, "__init__", Float);
 
         public static readonly Function Print_Int = new Function(null, "print", Int);
         public static readonly Function Print_Float = new Function(null, "print", Float);

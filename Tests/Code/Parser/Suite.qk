@@ -3,3 +3,8 @@
 def b():
 	x = 1
 	y = 2
+
+def c():
+    def d():
+        x = 1
+    y = 2

@@ -113,8 +113,7 @@ namespace Quirk.Tests
         }
 
         [TestMethod()]
-        public void Indents()
-        {
+        public void Indents() {
             var scan = new Scanner("Code/Scanner/Indents.qk");
             // ·# comment¶
             // x¶
@@ -190,6 +189,49 @@ namespace Quirk.Tests
             scan.Next();
             Assert.AreEqual(EndMarker, scan.Lexeme);
             scan.Next();
+            Assert.AreEqual(EndMarker, scan.Lexeme);
+        }
+
+        [TestMethod()]
+        public void Indents2() {
+            var scan = new Scanner("Code/Scanner/Indents2.qk");
+
+            // def f():¶
+            Assert.AreEqual(KwDef, scan.Lexeme); scan.Next();
+            Assert.AreEqual(Id, scan.Lexeme); scan.Next();
+            Assert.AreEqual(LeftParenthesis, scan.Lexeme); scan.Next();
+            Assert.AreEqual(RightParenthesis, scan.Lexeme); scan.Next();
+            Assert.AreEqual(Colon, scan.Lexeme); scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme); scan.Next();
+
+            // ····if True:¶
+            Assert.AreEqual(Indent, scan.Lexeme); scan.Next();
+            Assert.AreEqual(KwIf, scan.Lexeme); scan.Next();
+            Assert.AreEqual(KwTrue, scan.Lexeme); scan.Next();
+            Assert.AreEqual(Colon, scan.Lexeme); scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme); scan.Next();
+
+            // ········if True:¶
+            Assert.AreEqual(Indent, scan.Lexeme); scan.Next();
+            Assert.AreEqual(KwIf, scan.Lexeme); scan.Next();
+            Assert.AreEqual(KwTrue, scan.Lexeme); scan.Next();
+            Assert.AreEqual(Colon, scan.Lexeme); scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme); scan.Next();
+
+            // ············return b¶
+            Assert.AreEqual(Indent, scan.Lexeme); scan.Next();
+            Assert.AreEqual(KwReturn, scan.Lexeme); scan.Next();
+            Assert.AreEqual(Id, scan.Lexeme); scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme); scan.Next();
+
+            // ····return a¶
+            Assert.AreEqual(Dedent, scan.Lexeme); scan.Next();
+            Assert.AreEqual(Dedent, scan.Lexeme); scan.Next();
+            Assert.AreEqual(KwReturn, scan.Lexeme); scan.Next();
+            Assert.AreEqual(Id, scan.Lexeme); scan.Next();
+            Assert.AreEqual(NewLine, scan.Lexeme); scan.Next();
+
+            Assert.AreEqual(Dedent, scan.Lexeme); scan.Next();
             Assert.AreEqual(EndMarker, scan.Lexeme);
         }
 

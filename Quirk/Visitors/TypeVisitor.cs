@@ -137,6 +137,7 @@ namespace Quirk.Visitors
                         }
                         specFuncs.Add(func, spec);
                         overload.Funcs.Add(spec);
+                        func.Def.Specs.Add(spec);
                         spec.Accept(this);
                         result.Pop();
                     }

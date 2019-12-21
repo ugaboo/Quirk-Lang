@@ -80,14 +80,25 @@ namespace Quirk.Visitors {
         public void Visit(FuncDef funcDef) {
             var func = funcDef.Func;
             var name = func.Name;
-            if (Find(name) is Overload overload) {
-                overload = new Overload(overload);
+            if (name == "__init__") {
+                var obj = func.RetType;
+                Replace(ref obj);
+                if (obj is TypeObj typeObj) {
+                    typeObj.Initializers.Add(func);
+                } else {
+                    throw new CompilationError(ErrorType.NotAType);
+                }
+                defs.Peek().Add(func);
             } else {
-                overload = new Overload(name);
+                if (Find(name) is Overload overload) {
+                    overload = new Overload(overload);
+                } else {
+                    overload = new Overload(name);
+                }
+                overload.Funcs.Add(func);
+                nameTables.Peek()[name] = overload;
+                defs.Peek().Add(func);
             }
-            overload.Funcs.Add(func);
-            nameTables.Peek()[name] = overload;
-            defs.Peek().Add(func);
         }
 
         public void Visit(Assignment assignment) {
@@ -110,14 +121,27 @@ namespace Quirk.Visitors {
 
         public void Visit(FuncCall funcCall) {
             Replace(ref funcCall.Func);
-            var overload = (Overload)funcCall.Func;
-            var localCopy = new Overload(overload);
-            funcCall.Func = localCopy;
 
-            foreach (var func in overload.Funcs) {
-                if (RemoveDef(func)) {
-                    func.Accept(this);
+            if (funcCall.Func is Overload overload) {
+                var localCopy = new Overload(overload);
+                funcCall.Func = localCopy;
+
+                foreach (var func in overload.Funcs) {
+                    if (RemoveDef(func)) {
+                        func.Accept(this);
+                    }
                 }
+            } else if (funcCall.Func is TypeObj typeObj) {
+                var localCopy = new Overload(typeObj);
+                funcCall.Func = localCopy;
+
+                foreach (var func in typeObj.Initializers) {
+                    if (RemoveDef(func)) {
+                        func.Accept(this);
+                    }
+                }
+            } else {
+                throw new CompilationError(ErrorType.ObjectIsNotCallable);
             }
 
             var args = funcCall.Args;
@@ -199,7 +223,10 @@ namespace Quirk.Visitors {
         void AddBuiltIns(NameTable table) {
             table["Int"] = BuiltIns.Int;
             table["Float"] = BuiltIns.Float;
+
             table["Bool"] = BuiltIns.Bool;
+            BuiltIns.Bool.Initializers.Add(BuiltIns.Bool_Init_Int);
+            BuiltIns.Bool.Initializers.Add(BuiltIns.Bool_Init_Float);
 
             var print = new Overload("print");
             print.Funcs.Add(BuiltIns.Print_Int);

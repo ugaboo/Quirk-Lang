@@ -429,91 +429,107 @@ namespace Quirk.Tests
             new Parser("Code/Parser/FuncDef.qk", "FuncDef", out var module);
             Assert.AreEqual(7, module.Statements.Count);
 
-            var stmnt = (AST.FuncDef)module.Statements[0];
-            Assert.AreEqual("a", stmnt.Func.Name);
-            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
-            Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            Assert.AreEqual(null, stmnt.Func.RetType);
+            var defA = (AST.FuncDef)module.Statements[0];
+            var A = defA.Func;
+            Assert.AreEqual(defA, A.Def);
+            Assert.AreEqual("a", A.Name);
+            Assert.AreEqual(0, A.Parameters.Count);
+            Assert.AreEqual(0, A.Statements.Count);
+            Assert.AreEqual(null, A.RetType);
 
-            stmnt = (AST.FuncDef)module.Statements[1];
-            Assert.AreEqual("b", stmnt.Func.Name);
-            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
-            Assert.AreEqual(1, stmnt.Func.Statements.Count);
-            Assert.AreEqual(null, stmnt.Func.RetType);
+            var defB = (AST.FuncDef)module.Statements[1];
+            var B = defB.Func;
+            Assert.AreEqual(defB, B.Def);
+            Assert.AreEqual("b", B.Name);
+            Assert.AreEqual(0, B.Parameters.Count);
+            Assert.AreEqual(1, B.Statements.Count);
+            Assert.AreEqual(null, B.RetType);
 
-            var inner = (AST.FuncDef)stmnt.Func.Statements[0];
-            Assert.AreEqual("c", inner.Func.Name);
-            Assert.AreEqual(0, inner.Func.Parameters.Count);
-            Assert.AreEqual(0, inner.Func.Statements.Count);
-            Assert.AreEqual(null, inner.Func.RetType);
+            var defBC = (AST.FuncDef)B.Statements[0];
+            var BC = defBC.Func;
+            Assert.AreEqual(defBC, BC.Def);
+            Assert.AreEqual("c", BC.Name);
+            Assert.AreEqual(0, BC.Parameters.Count);
+            Assert.AreEqual(0, BC.Statements.Count);
+            Assert.AreEqual(null, BC.RetType);
 
-            stmnt = (AST.FuncDef)module.Statements[2];
-            Assert.AreEqual("c", stmnt.Func.Name);
-            Assert.AreEqual(1, stmnt.Func.Parameters.Count);
-            Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            var param = stmnt.Func.Parameters[0];
+            var defC = (AST.FuncDef)module.Statements[2];
+            var C = defC.Func;
+            Assert.AreEqual(defC, C.Def);
+            Assert.AreEqual("c", C.Name);
+            Assert.AreEqual(1, C.Parameters.Count);
+            Assert.AreEqual(0, C.Statements.Count);
+            var param = C.Parameters[0];
             Assert.AreEqual("x", param.Name);
             Assert.AreEqual(null, param.Type);
-            Assert.AreEqual(null, stmnt.Func.RetType);
+            Assert.AreEqual(null, C.RetType);
 
-            stmnt = (AST.FuncDef)module.Statements[3];
-            Assert.AreEqual("d", stmnt.Func.Name);
-            Assert.AreEqual(2, stmnt.Func.Parameters.Count);
-            Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            param = stmnt.Func.Parameters[0];
+            var defD = (AST.FuncDef)module.Statements[3];
+            var D = defD.Func;
+            Assert.AreEqual(defD, D.Def);
+            Assert.AreEqual("d", D.Name);
+            Assert.AreEqual(2, D.Parameters.Count);
+            Assert.AreEqual(0, D.Statements.Count);
+            param = D.Parameters[0];
             Assert.AreEqual("x", param.Name);
             Assert.AreEqual(null, param.Type);
-            param = stmnt.Func.Parameters[1];
+            param = D.Parameters[1];
             Assert.AreEqual("y", param.Name);
             Assert.AreEqual(null, param.Type);
-            Assert.AreEqual(null, stmnt.Func.RetType);
+            Assert.AreEqual(null, D.RetType);
 
-            stmnt = (AST.FuncDef)module.Statements[4];
-            Assert.AreEqual("a", stmnt.Func.Name);
-            Assert.AreEqual(1, stmnt.Func.Parameters.Count);
-            Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            param = stmnt.Func.Parameters[0];
+            var defA2 = (AST.FuncDef)module.Statements[4];
+            var A2 = defA2.Func;
+            Assert.AreEqual(defA2, A2.Def);
+            Assert.AreEqual("a", A2.Name);
+            Assert.AreEqual(1, A2.Parameters.Count);
+            Assert.AreEqual(0, A2.Statements.Count);
+            param = A2.Parameters[0];
             Assert.AreEqual("x", param.Name);
             Assert.AreEqual(null, param.Type);
-            Assert.AreEqual(null, stmnt.Func.RetType);
+            Assert.AreEqual(null, A2.RetType);
 
-            stmnt = (AST.FuncDef)module.Statements[5];
-            Assert.AreEqual("e", stmnt.Func.Name);
-            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
-            Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            Assert.AreEqual("Int", ((AST.NameObj)stmnt.Func.RetType).Name);
+            var defE = (AST.FuncDef)module.Statements[5];
+            var E = defE.Func;
+            Assert.AreEqual(defE, E.Def);
+            Assert.AreEqual("e", E.Name);
+            Assert.AreEqual(0, E.Parameters.Count);
+            Assert.AreEqual(0, E.Statements.Count);
+            Assert.AreEqual("Int", ((AST.NameObj)E.RetType).Name);
 
-            stmnt = (AST.FuncDef)module.Statements[6];
-            Assert.AreEqual("f", stmnt.Func.Name);
-            Assert.AreEqual(1, stmnt.Func.Parameters.Count);
-            Assert.AreEqual(0, stmnt.Func.Statements.Count);
-            param = stmnt.Func.Parameters[0];
+            var defF = (AST.FuncDef)module.Statements[6];
+            var F = defF.Func;
+            Assert.AreEqual(defF, F.Def);
+            Assert.AreEqual("f", F.Name);
+            Assert.AreEqual(1, F.Parameters.Count);
+            Assert.AreEqual(0, F.Statements.Count);
+            param = F.Parameters[0];
             Assert.AreEqual("x", param.Name);
             Assert.AreEqual("Int", ((AST.NameObj)param.Type).Name);
-            Assert.AreEqual(null, stmnt.Func.RetType);
+            Assert.AreEqual(null, F.RetType);
         }
 
         [TestMethod()]
         public void Suite()
         {
             new Parser("Code/Parser/Suite.qk", "Suite", out var module);
-            Assert.AreEqual(2, module.Statements.Count);
+            Assert.AreEqual(3, module.Statements.Count);
 
-            var stmnt = (AST.FuncDef)module.Statements[0];
-            Assert.AreEqual("a", stmnt.Func.Name);
-            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
-            Assert.AreEqual(0, stmnt.Func.Statements.Count);
+            var defA = (AST.FuncDef)module.Statements[0];
+            var a = defA.Func;
+            Assert.AreEqual(0, a.Statements.Count);
 
-            stmnt = (AST.FuncDef)module.Statements[1];
-            Assert.AreEqual("b", stmnt.Func.Name);
-            Assert.AreEqual(0, stmnt.Func.Parameters.Count);
-            Assert.AreEqual(2, stmnt.Func.Statements.Count);
-            var expr = (AST.Assignment)stmnt.Func.Statements[0];
-            Assert.AreEqual("x", ((AST.NameObj)expr.Left).Name);
-            Assert.AreEqual(1, ((AST.ConstInt)expr.Right).Value);
-            expr = (AST.Assignment)stmnt.Func.Statements[1];
-            Assert.AreEqual("y", ((AST.NameObj)expr.Left).Name);
-            Assert.AreEqual(2, ((AST.ConstInt)expr.Right).Value);
+            var defB = (AST.FuncDef)module.Statements[1];
+            var b = defB.Func;
+            Assert.IsInstanceOfType(b.Statements[0], typeof(AST.Assignment));
+            Assert.IsInstanceOfType(b.Statements[1], typeof(AST.Assignment));
+
+            var defC = (AST.FuncDef)module.Statements[2];
+            var c = defC.Func;
+            var defD = (AST.FuncDef)c.Statements[0];
+            Assert.IsInstanceOfType(c.Statements[1], typeof(AST.Assignment));
+            var d = defD.Func;
+            Assert.IsInstanceOfType(d.Statements[0], typeof(AST.Assignment));
         }
 
         [TestMethod()]
@@ -537,8 +553,7 @@ namespace Quirk.Tests
         }
 
         [TestMethod()]
-        public void If()
-        {
+        public void If() {
             new Parser("Code/Parser/If.qk", "If", out var module);
             //Assert.AreEqual(3, module.Statements.Count);
 
@@ -573,6 +588,28 @@ namespace Quirk.Tests
             Assert.AreEqual("x", ((AST.NameObj)if3.Condition).Name);
             Assert.AreEqual(0, if3.Then.Count);
             Assert.AreEqual(0, if3.Else.Count);
+        }
+
+        [TestMethod()]
+        public void If2() {
+            new Parser("Code/Parser/If2.qk", "If2", out var module);
+            Assert.AreEqual(1, module.Statements.Count);
+
+            var def = (AST.FuncDef)module.Statements[0];
+            var f = def.Func;
+            Assert.AreEqual(2, f.Statements.Count);
+
+            var if1 = (AST.IfStmnt)f.Statements[0];
+            Assert.AreEqual(1, if1.Then.Count);
+            Assert.AreEqual(0, if1.Else.Count);
+
+            var if2 = (AST.IfStmnt)if1.Then[0];
+            Assert.AreEqual(1, if2.Then.Count);
+            Assert.AreEqual(0, if2.Else.Count);
+
+            Assert.IsInstanceOfType(if2.Then[0], typeof(AST.ReturnStmnt));
+
+            Assert.IsInstanceOfType(f.Statements[1], typeof(AST.ReturnStmnt));
         }
     }
 }

@@ -131,9 +131,15 @@ namespace Quirk.Tests
             var x = (Variable)assignmentX.Left;
 
             var returnStmnt = (ReturnStmnt)module.Statements[2];
-            Assert.AreEqual(2, returnStmnt.Values.Count);
+            Assert.AreEqual(3, returnStmnt.Values.Count);
             Assert.AreEqual(x, returnStmnt.Values[0]);
             Assert.AreEqual(y, returnStmnt.Values[1]);
+
+            var add = (FuncCall)returnStmnt.Values[2];
+            var overload = (Overload)add.Func;
+            Assert.AreEqual("__add__", overload.Name);
+            Assert.AreEqual(x, add.Args[0]);
+            Assert.AreEqual(y, add.Args[1]);
         }
 
         [TestMethod()]
@@ -256,6 +262,32 @@ namespace Quirk.Tests
             var call = (FuncCall)eval.Expr;
             Assert.AreEqual(first, ((Overload)call.Func).Funcs[0]);
         }
+
+        [TestMethod()]
+        public void DeferedDef3() {
+            new Parser("Code/NameVisitor/DeferedDef3.qk", "DeferedDef3", out var module);
+            new Visitors.NameVisitor(module);
+
+            var def = (FuncDef)module.Statements[0];
+            var f = def.Func;
+
+            var def0 = (FuncDef)f.Statements[0];
+            var first = def0.Func;
+            var firstRet = (ReturnStmnt)first.Statements[0];
+
+            var def1 = (FuncDef)f.Statements[1];
+            var second = def1.Func;
+            var secondRet = (ReturnStmnt)second.Statements[0];
+
+            var call = (FuncCall)firstRet.Values[0];
+            var overload = (Overload)call.Func;
+            Assert.AreEqual(second, overload.Funcs[0]);
+
+            call = (FuncCall)secondRet.Values[0];
+            overload = (Overload)call.Func;
+            Assert.AreEqual(first, overload.Funcs[0]);
+        }
+
 
         [TestMethod()]
         public void BuiltIns()

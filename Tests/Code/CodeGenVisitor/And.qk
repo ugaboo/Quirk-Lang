@@ -1,0 +1,11 @@
+﻿def __init__(a) -> Bool:
+    return a
+
+def __and__(a, b):
+    if Bool(a) == True:
+        if Bool(b) == True:
+            return b
+    return a
+
+x = 1.0 / 3.0
+print(0.33 < x < 0.34)
