@@ -72,7 +72,7 @@ namespace Quirk.Visitors {
             varBlocks.Pop();
 
             LLVM.WriteBitcodeToFile(moduleLLVM, $"{module.Name}.bc");
-            LLVM.PrintModuleToFile(moduleLLVM, $"{module.Name}.ll", out var errorMsg);
+            LLVM.PrintModuleToFile(moduleLLVM, $"{module.Name}.ll", out var _);
         }
 
         public void Visit(AST.Overload overload) { throw new InvalidOperationException(); }
